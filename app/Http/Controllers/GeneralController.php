@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-
+use  App\Models\Folder;
 use App\Models\Document;
 
 class GeneralController extends Controller
@@ -23,7 +23,7 @@ class GeneralController extends Controller
     $porcentualUsedGB = round(($usedGB / $totalGB) * 100, 2);
     
     #Cuantos Docs hay 
-    $docs = Document::count("id");
+    $docs = Document::count("id"); //indexar documente Id, creo que ya esta indexado
 
 //El ultimo que subio
 //Cuantos docs se subieron en los ultimos 3 meses.
@@ -37,18 +37,68 @@ return [
 
     public function showDirs()
     {
-    $dirs= Storage::disk('public')->directories();
+    $dirs = Folder::select("id","folderName")->where("parentFolder",null)->paginate(10); //Indexar parentFolder   
     return  response()->json($dirs);  
 }
 
-
+public function showThisDir(Request $request)
+{
+    $thisDir = Folder::select("id","folderName")->where("parentFolder",$request->parentFolder)->paginate(10);  //Indexar parentFolder 
+    return  response()->json($thisDir);
+}
 
 
     public function makeDir(Request $request)
     {
-    $route = $request->input('route');
-    $path =Storage::disk('public')->makeDirectory($route);
+       $request->validate([
+        "parentFolder"=>"required|integer|min:0",
+        "folderName"=>"required|string|filled"
+       ]); 
 
+    $isRoot = false;
+    $folderName = $request->input('folderName');
+    $parentFolder = $request->input('parentFolder');
+
+     if ($parentFolder == 0)
+     {
+        $parentFolder = null;
+        $isRoot = true;
+     }
+     
+    $newFolder= Folder::create([
+        "folderName"=>$folderName ,
+        "parentFolder" =>$parentFolder,
+     ]);
+
+     if ($isRoot)
+     {
+         Storage::disk('public')->makeDirectory($newFolder->id);
+     }else
+     {
+$results = DB::select("
+    WITH RECURSIVE folder_tree AS (
+        SELECT id, folderName, parentFolder
+        FROM folders
+        WHERE id = ?
+
+        UNION ALL
+
+        SELECT f.id, f.folderName, f.parentFolder
+        FROM folders f
+        INNER JOIN folder_tree ft ON f.id = ft.parentFolder
+    )
+    SELECT parentFolder FROM folder_tree order by parentFolder ASC
+", [$newFolder->id]); 
+$path = "";
+foreach ($results as $item)
+{
+   $path .= $item->parentFolder . '/';
+}
+$fullPath = $path. $newFolder->id;
+Storage::disk('public')->makeDirectory($fullPath);
+
+}
+     return response()->json("Carpeta Creada con exito");
     }
 
     public function uploadDoc(Request $request)

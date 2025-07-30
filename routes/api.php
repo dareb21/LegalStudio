@@ -8,6 +8,7 @@ Route::middleware(['auth:sanctum'])->group( function (){
 Route::get("/dashboard",[GeneralController::class, 'dashboard']);
 
 Route::get("/dirs",[GeneralController::class, 'showDirs']);
+Route::get("/thisDir",[GeneralController::class, 'showThisDir']);
 Route::post("/makeDir",[GeneralController::class, 'makeDir']);
 Route::post("/uploadDoc",[GeneralController::class, 'uploadDoc']);
 

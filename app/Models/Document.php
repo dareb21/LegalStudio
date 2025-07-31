@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Document extends Model
 {
    protected $fillable =[
-    "documentPath",
+    "documentName",
+    "folder_id",
     "description",
     "judge",
     "whoMadeIt",
     "dateOfUpload",
     "photo",
-    "record_id",
+    "record",
     ];
 }

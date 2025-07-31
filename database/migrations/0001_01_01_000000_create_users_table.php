@@ -17,7 +17,6 @@ return new class extends Migration
             $table->date('birthday');
             $table->string('email')->unique();
             $table->string('phone')->unique() ;
-            $table->string('photo')->nullable();
             $table->enum('role', ['admin', 'Abogado', 'Asistente']);
            $table->rememberToken();
             $table->timestamps();

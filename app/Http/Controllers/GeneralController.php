@@ -95,35 +95,41 @@ foreach ($results as $item)
    $path .= $item->parentFolder . '/';
 }
 $fullPath = $path. $newFolder->id;
+$newFolder->folderPath=$fullPath;
+$newFolder->save();
 Storage::disk('public')->makeDirectory($fullPath);
 
 }
      return response()->json("Carpeta Creada con exito");
     }
 
+
+
     public function uploadDoc(Request $request)
-    {
+    { 
 $request->validate([
-        'folder' => 'required|string', 
+        'folderId' => 'required|int|min:0', 
     ]);
 
   DB::beginTransaction();
 try { 
-    $file = $request->file('file');
-    $fileName = $file->getClientOriginalName();
-    $filePath = $file->store($request->folder,$fileName ,'public');
+    $folderPath = Folder::select("folderPath")->where("id",$request->folderId)->first();
+//    $file = $request->file('file');
+  //  $fileName = $file->getClientOriginalName();
+    //$file->storeAs($folderPath,$fileName,"public");
+
       Document::create([ 
-          "documentPath"   => $filePath,
-          "documentName"    =>$fileName,
-            "description"    => $request->description,
-            "judge"          => $request->judge,
-            "whoMadeIt"      => Auth::user()->Name,
-            "dateOfUpload"   => now(),
-            "record_id"      => 1,
+          "documentName"   => $request->documentName,  //Esto es temporal, se sacara del $fileName
+          "folder_id"      =>$request->folderId,
+          "description"    => $request->description,
+          "judge"          => $request->judge,
+          "whoMadeIt"      => Auth::user()->name,
+          "dateOfUpload"   => now(),
+          "record"      => $request->record,
         ]);
         DB::commit();
 
-        return response()->json(['message' => 'Documento subido correctamente']);
+      return response()->json(['message' => 'Documento subido correctamente']);
     } catch (Exception $e) {
         DB::rollBack();
 

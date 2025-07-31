@@ -8,7 +8,8 @@ class Folder extends Model
 {
       protected $fillable =[
       "folderName",
-      "parentFolder"  
+      "parentFolder",
+      "folderPath"  
     ];
     
 }

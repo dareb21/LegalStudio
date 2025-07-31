@@ -14,15 +14,15 @@ return new class extends Migration
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->string("documentName");
-            $table->string("documentPath");
+            $table->foreignId('folder_id')->constrained();
             $table->text("description")->nullable();
             $table->string("judge")->nullable();
             $table->string("whoMadeIt");
             $table->dateTime("dateOfUpload");
             $table->string("photo")->nullable();
             $table->string("record")->nullable();
-            $table->unsignedBigInteger('record_id');
-            $table->foreign('record_id')->references('id')->on('records');
+            //$table->unsignedBigInteger('record_id');
+            //$table->foreign('record_id')->references('id')->on('records');
             $table->timestamps();
         });
     }

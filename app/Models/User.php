@@ -21,7 +21,9 @@ use HasApiTokens, HasFactory, Notifiable;
     protected $fillable = [
         'name',
         'email',
-        'password',
+        'birthday',
+        'phone',
+        'role',
     ];
 
     /**

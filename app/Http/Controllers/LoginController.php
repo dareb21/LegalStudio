@@ -19,7 +19,7 @@ try
     {
         $googleUser = Socialite::driver('google')->stateless()->user();
         $user = User::where("email",$googleUser->getEmail())->first(); 
-        if (!$user)
+        if (!$user || $user->banned == 1)
             {
                 
                 return abort(401,"Correo no Autorizado");

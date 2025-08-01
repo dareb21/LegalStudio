@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->unique() ;
             $table->enum('role', ['admin', 'Abogado', 'Asistente']);
-           $table->rememberToken();
+            $table->boolean("banned")->default(0);
+            $table->rememberToken();
             $table->timestamps();
         });
 

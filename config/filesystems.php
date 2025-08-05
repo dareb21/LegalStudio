@@ -46,6 +46,13 @@ return [
             'throw' => false,
             'report' => false,
         ],
+        'jurisprudence'=>[
+            "driver" =>"local",
+            "root"=>storage_path('app/Jurisprudence'),
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
 
         's3' => [
             'driver' => 's3',

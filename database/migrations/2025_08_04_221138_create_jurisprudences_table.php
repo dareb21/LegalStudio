@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('documents', function (Blueprint $table) {
+        Schema::create('jurisprudences', function (Blueprint $table) {
             $table->id();
             $table->string("documentName");
             $table->foreignId('folder_id')->constrained();
@@ -21,9 +21,8 @@ return new class extends Migration
             $table->dateTime("dateOfUpload");
             $table->boolean("isSensitive")->default(0);
             $table->string("photo")->nullable();
-            $table->string("record")->nullable();
             $table->softDeletes();
-            $table->boolean("hardDelete")->nullable();
+            $table->string("cause");
             //$table->unsignedBigInteger('record_id');
             //$table->foreign('record_id')->references('id')->on('records');
             $table->timestamps();
@@ -35,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('documents');
+        Schema::dropIfExists('jurisprudences');
     }
 };

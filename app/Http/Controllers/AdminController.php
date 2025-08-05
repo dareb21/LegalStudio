@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\DownloadRequest;
+use App\Models\Document;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -10,7 +13,6 @@ class AdminController extends Controller
 {
     return response()->json(User::paginate(10));
 }
-
 public function banThisUser($userId)
 {
  User::where("id", $userId)->update(["banned" => 1]);
@@ -52,4 +54,45 @@ public function editUser(Request $request,$userId)
 
 }
 
+public function seeRequest()
+{
+return DownloadRequest::join("documents","download_requests.document_id","=","documents.id")
+        ->join("users","download_requests.requested_by","=","users.id")
+        ->select("download_requests.id","documents.id","documents.documentName","users.name","download_requests.requestDate")
+        ->paginate(10);
+}
+
+public function replyRequest(DownloadRequest $thisRequest, Request $request)
+{
+$request->validate([
+    "reply"=>"required|boolean"
+]);
+
+$thisRequest->update([
+    "status"=>$request->reply,
+    "responded_by"=>Auth::id(),
+    "responseDate"=>now()
+]);
+$status = $request->reply ? "aprobada":"rechazada";
+return response()->json("Solicitud ".$status);
+}
+
+
+
+public function deleteDoc($thisDoc)
+{
+    Document::find($thisDoc)->delete();
+    return response()->json("El archivo se mando a la bandera de reciclaje");
+}
+
+public function recycleCan()
+{
+   return Document::onlyTrashed()->paginate(10);
+}
+
+public function restoreDoc($thisDoc)
+{
+Document::withTrashed()->find($thisDoc)->restore();
+return response()->json("Archivo restaurado");
+}
 }

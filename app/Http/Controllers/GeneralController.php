@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Sof;
 use Illuminate\Http\Request;
 use  App\Models\Folder;
 use App\Models\Document;
+use App\Models\DownloadRequest;
 
 class GeneralController extends Controller
 {
@@ -37,13 +39,13 @@ return [
 
     public function showDirs()
     {
-    $dirs = Folder::select("id","folderName")->where("parentFolder",null)->paginate(10); //Indexar parentFolder   
+    $dirs = Folder::select("id","folderName")->where("parentFolder",null)->where("jurisprudence",0)->paginate(10); //Indexar parentFolder   
     return  response()->json($dirs);  
 }
 
-public function showThisDir(Request $request)
+public function showThisDir($thisDir)
 {
-    $thisDir = Folder::select("id","folderName")->where("parentFolder",$request->parentFolder)->paginate(10);  //Indexar parentFolder 
+    $thisDir = Folder::select("id","folderName")->where("parentFolder",$thisDir)->paginate(10);  //Indexar parentFolder 
     return  response()->json($thisDir);
 }
 
@@ -51,7 +53,7 @@ public function showThisDir(Request $request)
     public function makeDir(Request $request)
     {
        $request->validate([
-        "parentFolder"=>"required|integer|min:0",
+        "parentFolder"=>"integer|min:1",
         "folderName"=>"required|string|filled"
        ]); 
 
@@ -98,33 +100,28 @@ $fullPath = $path. $newFolder->id;
 $newFolder->folderPath=$fullPath;
 $newFolder->save();
 Storage::disk('public')->makeDirectory($fullPath);
-
 }
      return response()->json("Carpeta Creada con exito");
     }
 
-
-
-    public function uploadDoc(Request $request)
+public function uploadDoc(Request $request,$thisDir)
     { 
-$request->validate([
-        'folderId' => 'required|int|min:0', 
-    ]);
-
   DB::beginTransaction();
 try { 
-    $folderPath = Folder::select("folderPath")->where("id",$request->folderId)->first();
-//    $file = $request->file('file');
-  //  $fileName = $file->getClientOriginalName();
-    //$file->storeAs($folderPath,$fileName,"public");
+    $dir=Folder::findOrFail($thisDir);
+    //$folderPath = Folder::select("folderPath","id")->where("id",$thisDir)->first();
+    // $file = $request->file('file');
+    //$fileName = $file->getClientOriginalName();
+    //$file->storeAs($dir->folderPath,$fileName,"public");
 
       Document::create([ 
           "documentName"   => $request->documentName,  //Esto es temporal, se sacara del $fileName
-          "folder_id"      =>$request->folderId,
+          "folder_id"      =>$dir->id,
           "description"    => $request->description,
           "judge"          => $request->judge,
           "whoMadeIt"      => Auth::user()->name,
           "dateOfUpload"   => now(),
+          "isSensitive" =>0,
           "record"      => $request->record,
         ]);
         DB::commit();
@@ -137,6 +134,49 @@ try {
     }
 }
 
+public function downloadDoc($thisDoc)
+{
+    $docInfo=Document::where("id",$thisDoc)->select("isSensitive")->first();
+    if ($docInfo->isSensitive == 0)
+    {
+            return response()->json("descarga Normal");
+    }
+
+    $x = DownloadRequest::where("document_id",$thisDoc)->where("requested_by",Auth::user()->id)->orderBy('created_at', 'desc')->first();
+
+    if (!$x)
+    {
+     return response()->json("Para este documento se ocupa permisos de descarga, favor solicite un permiso");  
+
+    }
+
+    if (is_null($x->status))
+    {
+        return response()->json("Su solicitud aun esta en proceso.");
+    }
+
+    if ( $x->status==1)
+    {
+        return response()->json("Su peticion de descarga fue Aprobada. Descargando...");
+    }else
+    {
+        return response()->json("Lo sentimos, su peticion de descarga fue rechazada. Intente en un futuro");
+    }    
+}
+
+ public function downloadRequest($thisDoc)
+{
+   $requestNum= DownloadRequest::create([
+        "document_id"=>$thisDoc,
+        "requestDate"=>now(),
+        "requested_by"=>Auth::user()->id,
+    ]);
+return response()->json([
+    "status"=>"Solicitud procesada con exito",
+"Numero de solicitud"=>$requestNum->id,
+]);
+
+}
 
 
 }

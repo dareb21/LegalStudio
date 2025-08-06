@@ -2,11 +2,6 @@ Datos Reunion 8/1/2025
 opcion de archivos recientemente eliminados 30 dias CD. <--Trabajando, bandeja terminado
 
 
-
-
-boton terminar juicio (manejar estado juicio terminado = activo, terminado)
-
 si juicio terminado dar opcion de que archivos diluir
 
 
-campo de busqueda - objeto de sentencia o conclusion de la sentencia<--Creo que es de front

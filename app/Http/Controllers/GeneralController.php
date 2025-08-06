@@ -10,11 +10,13 @@ use  App\Models\Folder;
 use App\Models\Document;
 use App\Models\DownloadRequest;
 use Illuminate\Support\Facades\Log;
+use App\Jobs\DeleteJob;
 
 class GeneralController extends Controller
 {
     public function dashboard()
     {
+     DeleteJob::dispatch();   
     #Espacio Disponible, Espacio Total, % de espacio ocupado    
     $totalSpace = disk_total_space(storage_path());
     $freeSpace = disk_free_space(storage_path()); 

@@ -5,6 +5,8 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 
 class LoginController extends Controller
 {
@@ -24,7 +26,10 @@ try
                 
                 return abort(401,"Correo no Autorizado");
             }
-            $token = $user->createToken("auth_token")->plainTextToken;   
+            $token = $user->createToken("auth_token")->plainTextToken;  
+            
+       Log::info($user->name ." ingreso a la plataforma el dia: " . now()->format('H:i d/m/Y'));
+     
     return response()->json([
     "status"=>"ok", 
     "email"=>$user->email,

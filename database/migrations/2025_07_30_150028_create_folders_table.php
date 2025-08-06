@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string("folderName");
             $table->text("folderPath")->nullable();
-            $table->enum('type', ['1', '2', '3']);
-            $table->foreignId('parentFolder')->nullable()->constrained('folders')->onDelete('cascade');
+            $table->enum('type', ['active', 'finished', 'jurisprudence']);
+            $table->tinyInteger("important")->default(3);
+            $table->foreignId('parentFolder')->nullable()->constrained('folders');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

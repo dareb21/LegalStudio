@@ -20,10 +20,10 @@ return new class extends Migration
             $table->string("whoMadeIt");
             $table->dateTime("dateOfUpload");
             $table->boolean("isSensitive")->default(0);
+            $table->tinyInteger("important")->default(3);;
             $table->string("photo")->nullable();
             $table->string("record")->nullable();
             $table->softDeletes();
-            $table->boolean("hardDelete")->nullable();
             //$table->unsignedBigInteger('record_id');
             //$table->foreign('record_id')->references('id')->on('records');
             $table->timestamps();

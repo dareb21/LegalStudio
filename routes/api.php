@@ -22,9 +22,11 @@ Route::middleware(['auth:sanctum'])->group( function (){
         Route::get('/seeRequest', [AdminController::class, 'seeRequest']);   
         Route::patch('/replyRequest/{thisRequest}', [AdminController::class, 'replyRequest']);
         Route::delete('/deleteDoc/{thisDoc}', [AdminController::class, 'deleteDoc']);
+        Route::delete('/deleteDir/{thisDir}', [AdminController::class, 'deleteDir']);
         Route::get('/recycle', [AdminController::class, 'recycleCan']);
         Route::patch('/restore/{thisDoc}', [AdminController::class, 'restoreDoc']);
-
+        Route::patch('/restoreDir/{thisDir}', [AdminController::class, 'restoreDir']);
+        Route::patch('/finished/{thisDir}', [AdminController::class, 'finishThisCase']);
         
     });
 

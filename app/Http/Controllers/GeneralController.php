@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use  App\Models\Folder;
 use App\Models\Document;
 use App\Models\DownloadRequest;
+use Illuminate\Support\Facades\Log;
 
 class GeneralController extends Controller
 {
@@ -27,8 +28,6 @@ class GeneralController extends Controller
     #Cuantos Docs hay 
     $docs = Document::count("id"); //indexar documente Id, creo que ya esta indexado
 
-//El ultimo que subio
-//Cuantos docs se subieron en los ultimos 3 meses.
 return [
         "freeSpace"=>$freeGB,
         "totalSpace"=>$totalGB,
@@ -37,16 +36,23 @@ return [
         ];
     }
 
-    public function showDirs()
+    public function showDirs(Request $request)
     {
-    $dirs = Folder::select("id","folderName")->where("parentFolder",null)->where("jurisprudence",0)->paginate(10); //Indexar parentFolder   
+    $request->validate([
+        "type"=>"required|string|in:active,finished,jurisprudence"
+    ]); 
+    $dirs = Folder::select("id","folderName")->where("parentFolder",null)->where("type",$request->type)->paginate(10); //Indexar parentFolder   
     return  response()->json($dirs);  
 }
 
 public function showThisDir($thisDir)
 {
-    $thisDir = Folder::select("id","folderName")->where("parentFolder",$thisDir)->paginate(10);  //Indexar parentFolder 
-    return  response()->json($thisDir);
+    $dirs = Folder::select("id","folderName","important")->where("parentFolder",$thisDir)->get();  //Indexar este campo
+    $docs =Document::where("folder_id",$thisDir)->OrderBy("created_at","desc")->paginate(10);          //Indexar esto tambien 
+    return  response()->json([
+        "dirs"=>$dirs,
+        "docs"=>$docs
+    ]);
 }
 
 
@@ -54,13 +60,16 @@ public function showThisDir($thisDir)
     {
        $request->validate([
         "parentFolder"=>"integer|min:1",
-        "folderName"=>"required|string|filled"
+        "important"=>"integer|in:1,2,3",
+        "folderName"=>"required|string|filled",
+        "folderType"=>"required|string|in:active,finished,jurisprudence"
        ]); 
-
+    
     $isRoot = false;
     $folderName = $request->input('folderName');
     $parentFolder = $request->input('parentFolder');
-
+    $type =  $request->input('folderType');
+     $important =  $request->input('important');
      if ($parentFolder == 0)
      {
         $parentFolder = null;
@@ -70,8 +79,9 @@ public function showThisDir($thisDir)
     $newFolder= Folder::create([
         "folderName"=>$folderName ,
         "parentFolder" =>$parentFolder,
+        "type"=>$type,
+        "important"=> $important
      ]);
-
      if ($isRoot)
      {
          Storage::disk('public')->makeDirectory($newFolder->id);
@@ -101,11 +111,19 @@ $newFolder->folderPath=$fullPath;
 $newFolder->save();
 Storage::disk('public')->makeDirectory($fullPath);
 }
+Log::info(Auth::user()->name ." Creo la carpeta: ".  $folderName ." a las " . now()->format('H:i d/m/Y'));   
+
      return response()->json("Carpeta Creada con exito");
     }
 
+   
+
 public function uploadDoc(Request $request,$thisDir)
     { 
+      $request->validate([
+         "important"=>"required|integer|in:1,2,3",
+        
+      ]);  
   DB::beginTransaction();
 try { 
     $dir=Folder::findOrFail($thisDir);
@@ -121,11 +139,13 @@ try {
           "judge"          => $request->judge,
           "whoMadeIt"      => Auth::user()->name,
           "dateOfUpload"   => now(),
-          "isSensitive" =>0,
+          "isSensitive" =>1,
           "record"      => $request->record,
+          "important" => $request->important
         ]);
         DB::commit();
-
+    Log::info(Auth::user()->name ." subio el archivo: ".  $request->documentName ." a las " . now()->format('H:i d/m/Y'));   
+        
       return response()->json(['message' => 'Documento subido correctamente']);
     } catch (Exception $e) {
         DB::rollBack();
@@ -136,9 +156,10 @@ try {
 
 public function downloadDoc($thisDoc)
 {
-    $docInfo=Document::where("id",$thisDoc)->select("isSensitive")->first();
+    $docInfo=Document::where("id",$thisDoc)->select("isSensitive","documentName")->first();
     if ($docInfo->isSensitive == 0)
     {
+            Log::info(Auth::user()->name ." descargo el archivo: ".  $docInfo->documentName ." a las " . now()->format('H:i d/m/Y'));   
             return response()->json("descarga Normal");
     }
 
@@ -146,6 +167,7 @@ public function downloadDoc($thisDoc)
 
     if (!$x)
     {
+    Log::info(Auth::user()->name ."intento  descargar el archivo: ".  $docInfo->documentName ." a las " . now()->format('H:i d/m/Y'));      
      return response()->json("Para este documento se ocupa permisos de descarga, favor solicite un permiso");  
 
     }
@@ -157,6 +179,8 @@ public function downloadDoc($thisDoc)
 
     if ( $x->status==1)
     {
+        Log::info(Auth::user()->name ." obtuvo permiso y descargo el archivo: ".  $docInfo->documentName ." a las " . now()->format('H:i d/m/Y'));  
+             
         return response()->json("Su peticion de descarga fue Aprobada. Descargando...");
     }else
     {
@@ -166,11 +190,13 @@ public function downloadDoc($thisDoc)
 
  public function downloadRequest($thisDoc)
 {
+   $file = Document::select("documentName")->where("id",$thisDoc)->first(); 
    $requestNum= DownloadRequest::create([
         "document_id"=>$thisDoc,
         "requestDate"=>now(),
         "requested_by"=>Auth::user()->id,
     ]);
+Log::info(Auth::user()->name ." Solicito una peticion para descargar el archivo: ".  $file->documentName ." a las " . now()->format('H:i d/m/Y'));   
 return response()->json([
     "status"=>"Solicitud procesada con exito",
 "Numero de solicitud"=>$requestNum->id,

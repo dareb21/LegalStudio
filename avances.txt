@@ -1,22 +1,12 @@
 Datos Reunion 8/1/2025
 opcion de archivos recientemente eliminados 30 dias CD. <--Trabajando, bandeja terminado
 
-quien hace cambios en archivo.
 
-tercer cuadro dashboard info de actividad. <--FrontEnd
 
-actividad en archivo (todos logs).
-
-token extra para admin.
-
-orden por fecha en lugar de alfabetico.
 
 boton terminar juicio (manejar estado juicio terminado = activo, terminado)
 
 si juicio terminado dar opcion de que archivos diluir
 
-antecedentes judiciales de clientes de abogados<--Su propia tabla
 
-campo de busqueda - objeto de sentencia o conclusion de la sentencia
-
-colores de estado rojo delicado, verde no tan enfasis, y el negro caso normal.<--FrontEnd
+campo de busqueda - objeto de sentencia o conclusion de la sentencia<--Creo que es de front

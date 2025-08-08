@@ -29,7 +29,8 @@ public function home()
 }
     public function dashboard()
     { 
-//     DeleteJob::dispatch();   
+     DeleteJob::dispatch();   
+     
     #Espacio Disponible, Espacio Total, % de espacio ocupado    
     $totalSpace = disk_total_space(storage_path());
     $freeSpace = disk_free_space(storage_path()); 

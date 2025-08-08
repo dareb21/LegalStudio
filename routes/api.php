@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GeneralController;
 use App\Http\Controllers\AdminController;
-
+use App\Http\Controllers\LaywerController;
 
 Route::middleware(['auth:sanctum'])->group( function (){
     Route::get("/dashboard",[GeneralController::class, 'dashboard']);
@@ -19,16 +19,19 @@ Route::middleware(['auth:sanctum'])->group( function (){
         Route::post('/newUser', [AdminController::class, 'newUser']);
         Route::patch('/banThisUser/{userId}', [AdminController::class, 'banThisUser']);
         Route::patch('/unBanThisUser/{userId}', [AdminController::class, 'unBanThisUser']);
-        Route::get('/seeRequest', [AdminController::class, 'seeRequest']);   
-        Route::patch('/replyRequest/{thisRequest}', [AdminController::class, 'replyRequest']);
-        Route::delete('/deleteDoc/{thisDoc}', [AdminController::class, 'deleteDoc']);
-        Route::delete('/deleteDir/{thisDir}', [AdminController::class, 'deleteDir']);
-        Route::get('/recycle', [AdminController::class, 'recycleCan']);
+        //ver logs
+        //Editar
+    });
+
+    Route::middleware(['isLaywer:Abogado'])->group(function () {
+        Route::get('/seeRequest', [LaywerController::class, 'seeRequest']);   
+        Route::patch('/replyRequest/{thisRequest}', [LaywerController::class, 'replyRequest']);
+        Route::delete('/deleteDoc/{thisDoc}', [LaywerController::class, 'deleteDoc']);
+        Route::delete('/deleteDir/{thisDir}', [LaywerController::class, 'deleteDir']);
+        Route::get('/recycle', [LaywerController::class, 'recycleCan']);
         Route::patch('/restore/{thisDoc}', [AdminController::class, 'restoreDoc']);
         Route::patch('/restoreDir/{thisDir}', [AdminController::class, 'restoreDir']);
         Route::patch('/finished/{thisDir}', [AdminController::class, 'finishThisCase']);
-        
     });
-
 
 });

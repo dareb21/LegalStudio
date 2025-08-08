@@ -18,6 +18,7 @@ class Document extends Model
     "isSensitive",
     "photo",
     "record",
-    "important"
+    "important",
+    "hardDelete"
     ];
 }

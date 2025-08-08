@@ -12,7 +12,8 @@ class Folder extends Model
       "parentFolder",
       "folderPath", 
       "type",
-      "important"
+      "important",
+      "hardDelete"
     ];
     
 }

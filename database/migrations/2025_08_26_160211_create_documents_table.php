@@ -23,10 +23,12 @@ return new class extends Migration
             $table->tinyInteger("important")->default(3);;
             $table->string("photo")->nullable();
             $table->string("record")->nullable();
-            $table->softDeletes();
             //$table->unsignedBigInteger('record_id');
             //$table->foreign('record_id')->references('id')->on('records');
             $table->timestamps();
+            $table->softDeletes();
+            $table->dateTime("hardDelete")->nullable();
+            
         });
     }
 

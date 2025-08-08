@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('parentFolder')->nullable()->constrained('folders');
             $table->timestamps();
             $table->softDeletes();
+            $table->dateTime("hardDelete")->nullable();
         });
     }
 

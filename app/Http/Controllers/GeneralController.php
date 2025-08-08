@@ -1,22 +1,35 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Sof;
 use Illuminate\Http\Request;
 use  App\Models\Folder;
 use App\Models\Document;
 use App\Models\DownloadRequest;
-use Illuminate\Support\Facades\Log;
 use App\Jobs\DeleteJob;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Sof;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+
 
 class GeneralController extends Controller
 {
-    public function dashboard()
+ private $now;
+
+    public function __construct()
     {
-     DeleteJob::dispatch();   
+        $this->now = now()->setTimezone('America/Tegucigalpa')->format('Y-m-d H:i:s');
+    }
+
+public function home()
+{
+    return view("prueba");
+}
+    public function dashboard()
+    { 
+//     DeleteJob::dispatch();   
     #Espacio Disponible, Espacio Total, % de espacio ocupado    
     $totalSpace = disk_total_space(storage_path());
     $freeSpace = disk_free_space(storage_path()); 
@@ -30,14 +43,17 @@ class GeneralController extends Controller
     #Cuantos Docs hay 
     $docs = Document::count("id"); //indexar documente Id, creo que ya esta indexado
 
+
+    //Logs ultimos 10
+    //Peticiones de descarga pendientes
 return [
         "freeSpace"=>$freeGB,
         "totalSpace"=>$totalGB,
         "usedGb"=>$porcentualUsedGB,
-        "howManyDocs"=>$docs
+        "howManyDocs"=>$docs,
         ];
     }
-
+//Cambiar nombre de carpeta
     public function showDirs(Request $request)
     {
     $request->validate([
@@ -113,7 +129,7 @@ $newFolder->folderPath=$fullPath;
 $newFolder->save();
 Storage::disk('public')->makeDirectory($fullPath);
 }
-Log::info(Auth::user()->name ." Creo la carpeta: ".  $folderName ." a las " . now()->format('H:i d/m/Y'));   
+Log::info(Auth::user()->name ." Creo la carpeta: ".  $folderName ." a las " . $this->now);   
 
      return response()->json("Carpeta Creada con exito");
     }
@@ -128,25 +144,23 @@ public function uploadDoc(Request $request,$thisDir)
       ]);  
   DB::beginTransaction();
 try { 
-    $dir=Folder::findOrFail($thisDir);
-    //$folderPath = Folder::select("folderPath","id")->where("id",$thisDir)->first();
-    // $file = $request->file('file');
-    //$fileName = $file->getClientOriginalName();
-    //$file->storeAs($dir->folderPath,$fileName,"public");
+    $folderPath = Folder::select("folderPath","id")->where("id",$thisDir)->first();
+    $file = $request->file('file');
+    $fileName = $file->getClientOriginalName();
+    $file->storeAs($folderPath->folderPath,$fileName,"public");
 
       Document::create([ 
-          "documentName"   => $request->documentName,  //Esto es temporal, se sacara del $fileName
-          "folder_id"      =>$dir->id,
+          "documentName"   => $fileName,  //Esto es temporal, se sacara del $fileName
+          "folder_id"      =>$folderPath->id,
           "description"    => $request->description,
           "judge"          => $request->judge,
           "whoMadeIt"      => Auth::user()->name,
-          "dateOfUpload"   => now(),
-          "isSensitive" =>1,
+          "dateOfUpload"   => $this->now,
           "record"      => $request->record,
           "important" => $request->important
         ]);
         DB::commit();
-    Log::info(Auth::user()->name ." subio el archivo: ".  $request->documentName ." a las " . now()->format('H:i d/m/Y'));   
+    Log::info(Auth::user()->name ." subio el archivo: ".  $request->documentName ." a las " . $this->now);   
         
       return response()->json(['message' => 'Documento subido correctamente']);
     } catch (Exception $e) {
@@ -161,27 +175,27 @@ public function downloadDoc($thisDoc)
     $docInfo=Document::where("id",$thisDoc)->select("isSensitive","documentName")->first();
     if ($docInfo->isSensitive == 0)
     {
-            Log::info(Auth::user()->name ." descargo el archivo: ".  $docInfo->documentName ." a las " . now()->format('H:i d/m/Y'));   
+            Log::info(Auth::user()->name ." descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);   
             return response()->json("descarga Normal");
     }
 
-    $x = DownloadRequest::where("document_id",$thisDoc)->where("requested_by",Auth::user()->id)->orderBy('created_at', 'desc')->first();
+    $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by",Auth::user()->id)->orderBy('created_at', 'desc')->first();
 
-    if (!$x)
+    if (!$petition)
     {
-    Log::info(Auth::user()->name ."intento  descargar el archivo: ".  $docInfo->documentName ." a las " . now()->format('H:i d/m/Y'));      
+    //Log::info(Auth::user()->name ."intento  descargar el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
      return response()->json("Para este documento se ocupa permisos de descarga, favor solicite un permiso");  
 
     }
 
-    if (is_null($x->status))
+    if (is_null($petition->status))
     {
         return response()->json("Su solicitud aun esta en proceso.");
     }
 
-    if ( $x->status==1)
+    if ( $petition->status==1)
     {
-        Log::info(Auth::user()->name ." obtuvo permiso y descargo el archivo: ".  $docInfo->documentName ." a las " . now()->format('H:i d/m/Y'));  
+        Log::info(Auth::user()->name ." obtuvo permiso y descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);  
              
         return response()->json("Su peticion de descarga fue Aprobada. Descargando...");
     }else
@@ -195,10 +209,10 @@ public function downloadDoc($thisDoc)
    $file = Document::select("documentName")->where("id",$thisDoc)->first(); 
    $requestNum= DownloadRequest::create([
         "document_id"=>$thisDoc,
-        "requestDate"=>now(),
+        "requestDate"=>$this->now,
         "requested_by"=>Auth::user()->id,
     ]);
-Log::info(Auth::user()->name ." Solicito una peticion para descargar el archivo: ".  $file->documentName ." a las " . now()->format('H:i d/m/Y'));   
+Log::info(Auth::user()->name ." Solicito una peticion para descargar el archivo: ".  $file->documentName ." a las " . $this->now);   
 return response()->json([
     "status"=>"Solicitud procesada con exito",
 "Numero de solicitud"=>$requestNum->id,

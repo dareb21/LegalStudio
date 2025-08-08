@@ -17,6 +17,7 @@ class AdminController extends Controller
 }
 public function banThisUser($userId)
 {
+    $now= now()->setTimezone('America/Tegucigalpa')->format('Y-m-d H:i:s');
  $user = User::select("name")->where("id",$userId)->first();   
 User::where("id", $userId)->update(["banned" => 1]);
 Log::info(Auth::user()->name ." bloqueo a ". $user->name ." a las " . now()->format('H:i d/m/Y'));    
@@ -92,19 +93,23 @@ return response()->json("Solicitud ".$status);
 
 public function deleteDoc($thisDoc)
 {
-    Document::find($thisDoc)->delete();
-    return response()->json("El archivo se mando a la bandera de reciclaje");
+   $doc= Document::find($thisDoc)->delete();
+Log::info(Auth::user()->name ." borro el archivo  ". $doc->documentName ." a las: " . now()->format('H:i d/m/Y'));      
+    return response()->json("El archivo se mando a la bandeja de reciclaje");
 }
+
  public function deleteDir($thisDir)
     {
-        Folder::find($thisDir)->delete();
-        return response()->json("La carpeta se mando a la bandera de reciclaje");
+        $dir =Folder::find($thisDir);
+        $dir->delete();
+        Log::info(Auth::user()->name ." borro la carpeta  ". $dir->folderName ." a las: " . now()->format('H:i d/m/Y'));      
+        return response()->json("La carpeta se mando a la bandeja de reciclaje");
     }
 
 public function recycleCan()
 {
-    $documents =Document::onlyTrashed()->paginate(10);
-    $folder =Folder::onlyTrashed()->paginate(10);
+    $documents =Document::onlyTrashed()->where("hardDelete",null)->paginate(10);
+    $folder =Folder::onlyTrashed()->where("hardDelete",null)->paginate(10);
 
    return response()->json([
    "documents"=>$documents,
@@ -114,13 +119,18 @@ public function recycleCan()
 
 public function restoreDoc($thisDoc)
 {
-Document::withTrashed()->find($thisDoc)->restore();
+$folder = Document::withTrashed()->find($thisDoc);
+$folder->restore();
+Log::info(Auth::user()->name ." restauro el documento ".  $folder->folderName ." a las " . now()->format('H:i d/m/Y'));   
 return response()->json("Archivo restaurado");
 }
 
 public function restoreDir($thisDir)
 {
-Folder::withTrashed()->find($thisDir)->restore();
+$folder=Folder::withTrashed()->find($thisDir);
+ $folder->restore();  
+
+Log::info(Auth::user()->name ." restauro la carpeta ".  $folder->folderName ." a las " . now()->format('H:i d/m/Y'));   
 return response()->json("Carpeta restaurada");
 }
 
@@ -129,6 +139,9 @@ public function finishThisCase(Folder $thisDir)
     $thisDir->update([
         "type"=>"finished"
     ]);
+ 
+Log::info(Auth::user()->name ." cerrô el caso ".  $thisDir->folderName ." a las " . now()->format('H:i d/m/Y'));   
+   
     return response()->json("Su caso paso a cerrado");
 }
 

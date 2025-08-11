@@ -9,6 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use App\Models\Folder;
+use App\Models\Document;
 use Illuminate\Support\Facades\Storage;
 class DeleteJob implements ShouldQueue
 {
@@ -28,7 +29,12 @@ class DeleteJob implements ShouldQueue
     public function handle(): void
     {
   $dirs = Folder::withTrashed()->whereNotNull("hardDelete")->select("folderPath","id")->get();
-    
+  $docs = Document::withTrashed()
+                  ->join("folders","documents.folder_id","=","folders.id")
+                  ->select("folders.filePath as filePath")
+                  ->whereNotNull("hardDelete")
+                  ->get();
+
    foreach ($dirs as $dir)
    {
     if(is_null($dir->folderPath))
@@ -39,7 +45,7 @@ class DeleteJob implements ShouldQueue
     {
          Storage::disk("public")->deleteDirectory($dir->folderPath); 
     }
-   }
    
-    }
+}
+  }
 }

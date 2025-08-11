@@ -99,11 +99,11 @@ public function showThisDir($thisDir)
         "folderName"=>$folderName ,
         "parentFolder" =>$parentFolder,
         "type"=>$type,
-        "important"=> $important
+        "important"=> "3",
      ]);
      if ($isRoot)
      {
-         Storage::disk('public')->makeDirectory($newFolder->id);
+         Storage::disk('private')->makeDirectory($newFolder->id);
      }else
      {
 $results = DB::select("
@@ -128,7 +128,7 @@ foreach ($results as $item)
 $fullPath = $path. $newFolder->id;
 $newFolder->folderPath=$fullPath;
 $newFolder->save();
-Storage::disk('public')->makeDirectory($fullPath);
+Storage::disk('private')->makeDirectory($fullPath);
 }
 Log::info(Auth::user()->name ." Creo la carpeta: ".  $folderName ." a las " . $this->now);   
 
@@ -145,18 +145,29 @@ public function uploadDoc(Request $request,$thisDir)
       ]);  
   DB::beginTransaction();
 try { 
-    $folderPath = Folder::select("folderPath","id")->where("id",$thisDir)->first();
+    $folder = Folder::select("folderPath","id")->where("id",$thisDir)->first();
     $file = $request->file('file');
     $fileName = $file->getClientOriginalName();
-    $file->storeAs($folderPath->folderPath,$fileName,"public");
+if($folder)
+{
+  if (is_null($folder->folderPath))
+    {
+        $file->storeAs("/".$folder->id,$fileName,"private");
+    }else
+    {
+        $file->storeAs($folder->folderPath,$fileName,"private");
+    }
+}
 
+    
       Document::create([ 
-          "documentName"   => $fileName,  //Esto es temporal, se sacara del $fileName
-          "folder_id"      =>$folderPath->id,
+          "documentName"   => $fileName,  
+          "folder_id"      =>$folder->id,
           "description"    => $request->description,
           "judge"          => $request->judge,
-          "whoMadeIt"      => Auth::user()->name,
+          "whoMadeIt"      => "Carlos",//Auth::user()->name,
           "dateOfUpload"   => $this->now,
+          "isSensitive"    =>1,
           "record"      => $request->record,
           "important" => $request->important
         ]);
@@ -173,18 +184,20 @@ try {
 
 public function downloadDoc($thisDoc)
 {
-    $docInfo=Document::where("id",$thisDoc)->select("isSensitive","documentName")->first();
+    $docInfo=Document::where("id",$thisDoc)->select("isSensitive","documentName","folder_id")->first();
+    $folderPath = Folder::select("folderPath")->where("id",$docInfo->folder_id)->first();
+     $path =ltrim($folderPath->folderPath . "/" . $docInfo->documentName);
     if ($docInfo->isSensitive == 0)
-    {
-            Log::info(Auth::user()->name ." descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);   
-            return response()->json("descarga Normal");
+    {   
+     Log::info(Auth::user()->name ." descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
+     return Storage::disk("private")->download($path);     
     }
 
     $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by",Auth::user()->id)->orderBy('created_at', 'desc')->first();
 
     if (!$petition)
     {
-    //Log::info(Auth::user()->name ."intento  descargar el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
+    Log::info(Auth::user()->name ."intento  descargar el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
      return response()->json("Para este documento se ocupa permisos de descarga, favor solicite un permiso");  
 
     }
@@ -197,8 +210,7 @@ public function downloadDoc($thisDoc)
     if ( $petition->status==1)
     {
         Log::info(Auth::user()->name ." obtuvo permiso y descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);  
-             
-        return response()->json("Su peticion de descarga fue Aprobada. Descargando...");
+    return Storage::disk("private")->download($path);         
     }else
     {
         return response()->json("Lo sentimos, su peticion de descarga fue rechazada. Intente en un futuro");

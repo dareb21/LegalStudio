@@ -130,7 +130,7 @@ $newFolder->folderPath=$fullPath;
 $newFolder->save();
 Storage::disk('legalStudio')->makeDirectory($fullPath);
 }
-Log::info(Auth::user()->name ." Creo la carpeta: ".  $folderName ." a las " . $this->now);   
+//Log::info(Auth::user()->name ." Creo la carpeta: ".  $folderName ." a las " . $this->now);   
 
      return response()->json("Carpeta Creada con exito");
     }
@@ -174,7 +174,7 @@ if($folder)
           "important" => $request->important
         ]);
         DB::commit();
-    Log::info(Auth::user()->name ." subio el archivo: ".  $request->documentName ." a las " . $this->now);   
+  //  Log::info(Auth::user()->name ." subio el archivo: ".  $request->documentName ." a las " . $this->now);   
         
       return response()->json(['message' => 'Documento subido correctamente']);
     } catch (Exception $e) {
@@ -190,7 +190,7 @@ public function downloadDoc($thisDoc)
      $path =ltrim($docInfo->folderPath . "/" . $docInfo->documentName);
     if ($docInfo->isSensitive == 0)
     {   
-        Log::info(Auth::user()->name ." descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
+    //    Log::info(Auth::user()->name ." descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
          return Storage::disk("legalStudio")->download($path);    
     }
 
@@ -198,7 +198,7 @@ public function downloadDoc($thisDoc)
 
     if (!$petition)
     {
-    Log::info(Auth::user()->name ."intento  descargar el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
+    //Log::info(Auth::user()->name ."intento  descargar el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
      return response()->json("Para este documento se ocupa permisos de descarga, favor solicite un permiso");  
 
     }
@@ -210,7 +210,7 @@ public function downloadDoc($thisDoc)
 
     if ( $petition->status==1)
     {
-        Log::info(Auth::user()->name ." obtuvo permiso y descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);  
+      //  Log::info(Auth::user()->name ." obtuvo permiso y descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);  
     return Storage::disk("legalStudio")->download($path);         
     }else
     {
@@ -226,7 +226,7 @@ public function downloadDoc($thisDoc)
         "requestDate"=>$this->now,
         "requested_by"=>Auth::user()->id,
     ]);
-Log::info(Auth::user()->name ." Solicito una peticion para descargar el archivo: ".  $file->documentName ." a las " . $this->now);   
+//Log::info(Auth::user()->name ." Solicito una peticion para descargar el archivo: ".  $file->documentName ." a las " . $this->now);   
 return response()->json([
     "status"=>"Solicitud procesada con exito",
 "Numero de solicitud"=>$requestNum->id,

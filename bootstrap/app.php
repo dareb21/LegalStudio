@@ -16,8 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'isAdmin' => \App\Http\Middleware\AdminMiddleware::class,
             'isLaywer'=>\App\Http\Middleware\laywerMiddleware::class,
         ]);
-        
-      })
+        $middleware->validateCsrfTokens(except:[
+            "/*"
+        ]);
+})
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();

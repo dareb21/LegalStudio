@@ -19,6 +19,7 @@ class Document extends Model
     "photo",
     "record",
     "important",
-    "hardDelete"
+    "hardDelete",
+    "folderPath"
     ];
 }

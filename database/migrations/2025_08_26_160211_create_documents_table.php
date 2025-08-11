@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("documentName");
             $table->foreignId('folder_id')->constrained();
+            $table->text("folderPath");
             $table->text("description")->nullable();
             $table->string("judge")->nullable();
             $table->string("whoMadeIt");

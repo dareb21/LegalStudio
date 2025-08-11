@@ -163,6 +163,7 @@ if($folder)
       Document::create([ 
           "documentName"   => $fileName,  
           "folder_id"      =>$folder->id,
+          "folderPath" =>   $folder->folderPath,
           "description"    => $request->description,
           "judge"          => $request->judge,
           "whoMadeIt"      => "Carlos",//Auth::user()->name,
@@ -184,13 +185,12 @@ if($folder)
 
 public function downloadDoc($thisDoc)
 {
-    $docInfo=Document::where("id",$thisDoc)->select("isSensitive","documentName","folder_id")->first();
-    $folderPath = Folder::select("folderPath")->where("id",$docInfo->folder_id)->first();
-     $path =ltrim($folderPath->folderPath . "/" . $docInfo->documentName);
+    $docInfo=Document::where("id",$thisDoc)->select("isSensitive","documentName","folderPath")->first();
+     $path =ltrim($docInfo->folderPath . "/" . $docInfo->documentName);
     if ($docInfo->isSensitive == 0)
     {   
-     Log::info(Auth::user()->name ." descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
-     return Storage::disk("private")->download($path);     
+        Log::info(Auth::user()->name ." descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
+         return Storage::disk("private")->download($path);    
     }
 
     $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by",Auth::user()->id)->orderBy('created_at', 'desc')->first();

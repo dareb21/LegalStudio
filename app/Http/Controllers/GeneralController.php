@@ -32,8 +32,8 @@ public function home()
      DeleteJob::dispatch();   
      
     #Espacio Disponible, Espacio Total, % de espacio ocupado    
-    $totalSpace = disk_total_space(storage_path());
-    $freeSpace = disk_free_space(storage_path()); 
+    $totalSpace = disk_total_space("C:\LegalStudio");
+    $freeSpace = disk_free_space("C:\LegalStudio"); 
 
     $freeGB = round($freeSpace / 1024 / 1024 / 1024, 2); 
     $totalGB = round($totalSpace / 1024 / 1024 / 1024, 2);
@@ -103,7 +103,7 @@ public function showThisDir($thisDir)
      ]);
      if ($isRoot)
      {
-         Storage::disk('private')->makeDirectory($newFolder->id);
+         Storage::disk('legalStudio')->makeDirectory($newFolder->id);
      }else
      {
 $results = DB::select("
@@ -128,7 +128,7 @@ foreach ($results as $item)
 $fullPath = $path. $newFolder->id;
 $newFolder->folderPath=$fullPath;
 $newFolder->save();
-Storage::disk('private')->makeDirectory($fullPath);
+Storage::disk('legalStudio')->makeDirectory($fullPath);
 }
 Log::info(Auth::user()->name ." Creo la carpeta: ".  $folderName ." a las " . $this->now);   
 
@@ -148,14 +148,15 @@ try {
     $folder = Folder::select("folderPath","id")->where("id",$thisDir)->first();
     $file = $request->file('file');
     $fileName = $file->getClientOriginalName();
+    
 if($folder)
 {
   if (is_null($folder->folderPath))
     {
-        $file->storeAs("/".$folder->id,$fileName,"private");
+        $file->storeAs("/".$folder->id,$fileName,"legalStudio");
     }else
     {
-        $file->storeAs($folder->folderPath,$fileName,"private");
+        $file->storeAs($folder->folderPath,$fileName,"legalStudio");
     }
 }
 
@@ -190,7 +191,7 @@ public function downloadDoc($thisDoc)
     if ($docInfo->isSensitive == 0)
     {   
         Log::info(Auth::user()->name ." descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
-         return Storage::disk("private")->download($path);    
+         return Storage::disk("legalStudio")->download($path);    
     }
 
     $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by",Auth::user()->id)->orderBy('created_at', 'desc')->first();
@@ -210,7 +211,7 @@ public function downloadDoc($thisDoc)
     if ( $petition->status==1)
     {
         Log::info(Auth::user()->name ." obtuvo permiso y descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);  
-    return Storage::disk("private")->download($path);         
+    return Storage::disk("legalStudio")->download($path);         
     }else
     {
         return response()->json("Lo sentimos, su peticion de descarga fue rechazada. Intente en un futuro");

@@ -55,6 +55,15 @@ return [
             'report' => false,
         ],
 
+        'legalStudio'=> [
+             'driver' => 'local',
+            'root' => "C:\LegalStudio",
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

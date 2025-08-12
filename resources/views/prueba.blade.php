@@ -7,7 +7,7 @@
 <body>
     <h1>Subir archivo</h1>
 
-    <form action="/uploadDoc/3" method="POST" enctype="multipart/form-data">
+    <form action="/uploadDoc/10" method="POST" enctype="multipart/form-data">
         <!-- Token CSRF de Laravel -->
        @csrf
         <input type="file" name="file" required>

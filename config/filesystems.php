@@ -55,9 +55,9 @@ return [
             'report' => false,
         ],
 
-        'legalStudio'=> [
+        'estudioLegal'=> [
              'driver' => 'local',
-            'root' => "C:\LegalStudio",
+            'root' => "/estudioLegal",
             'visibility' => 'private',
             'throw' => false,
             'report' => false,

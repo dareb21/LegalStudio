@@ -158,10 +158,14 @@ if($folder)
 {
   if (is_null($folder->folderPath))
     {
-        $file->storeAs("/".$folder->id,$fileName,"estudioLegal");
+        $folderPath = "/". $folder->id;
+        $file->storeAs($folderPath,$fileName,"estudioLegal");
+        
     }else
     {
-        $file->storeAs($folder->folderPath,$fileName,"estudioLegal");
+        $folderPath = $folder->folderPath;
+        $file->storeAs($folderPath,$fileName,"estudioLegal");
+        
     }
 }
 
@@ -169,7 +173,7 @@ if($folder)
       Document::create([ 
           "documentName"   => $fileName,  
           "folder_id"      =>$folder->id,
-          "folderPath" =>   $folder->folderPath,
+          "folderPath" =>   $folderPath,
           "description"    => $request->description,
           "judge"          => $request->judge,
           "whoMadeIt"      => "Carlos",//Auth::user()->name,

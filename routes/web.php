@@ -10,7 +10,8 @@ Route::get('/', function () {
     return ['Laravel' => app()->version()];
 });
     Route::get("/dashboard",[GeneralController::class, 'dashboard']);
-    Route::get("/dirs",[GeneralController::class, 'showDirs']);
+
+    Route::get("/dirs/{type}",[GeneralController::class, 'showDirs']);
     Route::get("/thisDir/{thisDir}",[GeneralController::class, 'showThisDir']);
     Route::post("/makeDir",[GeneralController::class, 'makeDir']);
     Route::post("/uploadDoc/{thisDir}",[GeneralController::class, 'uploadDoc']);

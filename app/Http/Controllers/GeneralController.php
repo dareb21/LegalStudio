@@ -29,7 +29,7 @@ public function home()
 }
     public function dashboard()
     { 
-     DeleteJob::dispatch();   
+     //DeleteJob::dispatch();   
      
     #Espacio Disponible, Espacio Total, % de espacio ocupado    
     $totalSpace = disk_total_space("/estudioLegal");
@@ -48,19 +48,18 @@ public function home()
     //Logs ultimos 10
     //Peticiones de descarga pendientes
 return [
-        "freeSpace"=>$freeGB,
         "totalSpace"=>$totalGB,
         "usedGb"=>$porcentualUsedGB,
         "howManyDocs"=>$docs,
         ];
     }
 //Cambiar nombre de carpeta
-    public function showDirs(Request $request)
+    public function showDirs($type)
     {
-    $request->validate([
-        "type"=>"required|string|in:active,finished,jurisprudence"
-    ]); 
-    $dirs = Folder::select("id","folderName")->where("parentFolder",null)->where("type",$request->type)->paginate(10); //Indexar parentFolder   
+    if (!in_array($type, ['active', 'finished', 'jurisprudence'])) {
+        return response()->json(['error' => 'Tipo de carpeta no reconocido'], );
+    }    
+    $dirs = Folder::select("id","folderName")->where("parentFolder",null)->where("type",$type)->paginate(10); //Indexar parentFolder   
     return  response()->json($dirs);  
 }
 
@@ -224,7 +223,7 @@ public function downloadDoc($thisDoc)
    $requestNum= DownloadRequest::create([
         "document_id"=>$thisDoc,
         "requestDate"=>$this->now,
-        "requested_by"=>Auth::user()->id,
+        "requested_by"=> 1 //Auth::user()->id,
     ]);
 //Log::info(Auth::user()->name ." Solicito una peticion para descargar el archivo: ".  $file->documentName ." a las " . $this->now);   
 return response()->json([

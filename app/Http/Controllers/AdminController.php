@@ -8,6 +8,13 @@ use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
+     private $now;
+
+    public function __construct()
+    {
+        $this->now = now()->setTimezone('America/Tegucigalpa')->format('Y-m-d H:i:s');
+    }
+
     public function showUsers()
     {
     return response()->json(User::paginate(10));
@@ -15,10 +22,10 @@ class AdminController extends Controller
 
     public function banThisUser($userId)
     {
-        $now= now()->setTimezone('America/Tegucigalpa')->format('Y-m-d H:i:s');
+     
         $user = User::select("name")->where("id",$userId)->first();   
         User::where("id", $userId)->update(["banned" => 1]);
-        Log::info(Auth::user()->name ." bloqueo a ". $user->name ." a las " . now()->format('H:i d/m/Y'));    
+        //Log::info(Auth::user()->name ." bloqueo a ". $user->name ." a las " . $this->now);    
     return response()->json("Usuario bloqueado con exito");
     }
 
@@ -26,7 +33,7 @@ class AdminController extends Controller
     {
         $user = User::select("name")->where("id",$userId)->first();
         User::where("id", $userId)->update(["banned" => 0]);
-        Log::info(Auth::user()->name ." desbloqueo a ". $user->name ." a las " . now()->format('H:i d/m/Y'));  
+        //Log::info(Auth::user()->name ." desbloqueo a ". $user->name ." a las " . $this->now);  
     return response()->json("Usuario desbloqueado con exito");
     }
 
@@ -48,7 +55,7 @@ class AdminController extends Controller
                 "phone"=>$request->phone,
                 "role"=>$request->role,
             ]);
-        Log::info(Auth::user()->name ." creo un nuevo usuario bajo el nombre de  ". $request->name ."y le asigno el rol de ". $request->role. ". " . now()->format('H:i d/m/Y'));      
+        //Log::info(Auth::user()->name ." creo un nuevo usuario bajo el nombre de  ". $request->name ."y le asigno el rol de ". $request->role. ". " . $this->now);      
     return response()->json("Usuario creado con exito!"); 
     } 
     catch (Exception $e) {

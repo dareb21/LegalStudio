@@ -28,7 +28,7 @@ try
             }
             $token = $user->createToken("auth_token")->plainTextToken;  
             
-       Log::info($user->name ." ingreso a la plataforma el dia: " . now()->format('H:i d/m/Y'));
+       //Log::info($user->name ." ingreso a la plataforma el dia: " . now()->format('H:i d/m/Y'));
      
     return response()->json([
     "status"=>"ok", 

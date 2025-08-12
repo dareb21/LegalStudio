@@ -11,6 +11,13 @@ use Illuminate\Support\Facades\Log;
 
 class LaywerController extends Controller
 {
+  private $now;
+
+    public function __construct()
+    {
+        $this->now = now()->setTimezone('America/Tegucigalpa')->format('Y-m-d H:i:s');
+    }
+
    public function seeRequest()
     {
       $petition =  DownloadRequest::join("documents","download_requests.document_id","=","documents.id")
@@ -34,7 +41,7 @@ class LaywerController extends Controller
 
         $status = $request->reply ? "aprobada":"rechazada";
         
-        Log::info(Auth::user()->name ." dio como  ". $status ." la solicitud. " . now()->format('H:i d/m/Y'));  
+        //Log::info(Auth::user()->name ." dio como  ". $status ." la solicitud. " . $this->now);  
         
     return response()->json("Solicitud ".$status);
     }
@@ -42,7 +49,7 @@ class LaywerController extends Controller
     public function deleteDoc($thisDoc)
     {
         $doc= Document::find($thisDoc)->delete();
-        Log::info(Auth::user()->name ." borro el archivo  ". $doc->documentName ." a las: " . now()->format('H:i d/m/Y'));      
+        //Log::info(Auth::user()->name ." borro el archivo  ". $doc->documentName ." a las: " . $this->now);      
     
     return response()->json("El archivo se mando a la bandeja de reciclaje");
     }
@@ -51,7 +58,7 @@ class LaywerController extends Controller
     {
         $dir =Folder::find($thisDir);
         $dir->delete();
-        Log::info(Auth::user()->name ." borro la carpeta  ". $dir->folderName ." a las: " . now()->format('H:i d/m/Y'));      
+        //Log::info(Auth::user()->name ." borro la carpeta  ". $dir->folderName ." a las: " . $this->now);      
     return response()->json("La carpeta se mando a la bandeja de reciclaje");
     }
 
@@ -70,7 +77,7 @@ class LaywerController extends Controller
     {
         $folder = Document::withTrashed()->find($thisDoc);
         $folder->restore();
-        Log::info(Auth::user()->name ." restauro el documento ".  $folder->folderName ." a las " . now()->format('H:i d/m/Y'));   
+        //Log::info(Auth::user()->name ." restauro el documento ".  $folder->folderName ." a las " . $this->now);   
     return response()->json("Archivo restaurado");
     }
 
@@ -78,7 +85,7 @@ class LaywerController extends Controller
     {
         $folder=Folder::withTrashed()->find($thisDir);
         $folder->restore();  
-        Log::info(Auth::user()->name ." restauro la carpeta ".  $folder->folderName ." a las " . now()->format('H:i d/m/Y'));   
+        //Log::info(Auth::user()->name ." restauro la carpeta ".  $folder->folderName ." a las " . $this->now);   
     return response()->json("Carpeta restaurada");
     }
 
@@ -87,7 +94,7 @@ class LaywerController extends Controller
         $thisDir->update([
             "type"=>"finished"
         ]);
-        Log::info(Auth::user()->name ." cerrô el caso ".  $thisDir->folderName ." a las " . now()->format('H:i d/m/Y'));   
+        //Log::info(Auth::user()->name ." cerrô el caso ".  $thisDir->folderName ." a las " . $this->now);   
     return response()->json("Su caso paso a cerrado");
     }
 

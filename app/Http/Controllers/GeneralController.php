@@ -59,7 +59,7 @@ return [
     if (!in_array($type, ['active', 'finished', 'jurisprudence'])) {
         return response()->json(['error' => 'Tipo de carpeta no reconocido'], );
     }    
-    $dirs = Folder::select("id","folderName")->where("parentFolder",null)->where("type",$type)->paginate(10); //Indexar parentFolder   
+    $dirs = Folder::select("id","folderName")->where("parentFolder",null)->where("type",$type)->get(); //Indexar parentFolder   
     return  response()->json($dirs);  
 }
 
@@ -74,7 +74,7 @@ public function showThisDir($thisDir)
 }
 
 
-    public function makeDir(Request $request)
+    public function makeDir(Request $request)    ## Agarrar el parametro de la carpeta padre
     {
        $request->validate([
         "parentFolder"=>"integer|min:1",
@@ -129,6 +129,12 @@ $newFolder->folderPath=$fullPath;
 $newFolder->save();
 Storage::disk('estudioLegal')->makeDirectory($fullPath);
 }
+/*Logger::create([
+    "user_id" => Auth::id(),
+    "action" => "Creo una carpeta".,
+    "details" => Auth::users()->name . " creo una carpeta llamada " . $folderName . " del tipo " . $type . " a las " . $this->now,
+    "timestamp" => now()
+]);*/
 //Log::info(Auth::user()->name ." Creo la carpeta: ".  $folderName ." a las " . $this->now);   
 
      return response()->json("Carpeta Creada con exito");

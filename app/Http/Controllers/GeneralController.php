@@ -183,12 +183,8 @@ if($folder)
           "important" => $request->important
         ]);
         DB::commit();
-  //  Log::info(Auth::user()->name ." subio el archivo: ".  $request->documentName ." a las " . $this->now);   
-       $end = microtime(true);
-        $executionTime = $end - $start;
-        
-        Log::info("El tiempo de ejecucion de la subida del archivo fue: " . $executionTime . " segundos"); 
-      return response()->json(['message' => 'Documento subido correctamente']);
+  //  Log::info(Auth::user()->name ." subio el archivo: ".  $request->documentName ." a las " . $this->now);      
+             return response()->json(['message' => 'Documento subido correctamente']);
     } catch (Exception $e) {
         DB::rollBack();
 

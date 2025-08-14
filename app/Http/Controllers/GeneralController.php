@@ -65,8 +65,8 @@ return [
 
 public function showThisDir($thisDir)
 {
-    $dirs = Folder::select("id","folderName","important")->where("parentFolder",$thisDir)->get();  //Indexar este campo
-    $docs =Document::where("folder_id",$thisDir)->OrderBy("created_at","desc")->paginate(10);          //Indexar esto tambien 
+    $dirs = Folder::select("id","folderName","important")->where("parentFolder",$thisDir)->paginate(20);  //Indexar este campo
+    $docs =Document::where("folder_id",$thisDir)->OrderBy("created_at","desc")->paginate(20);          //Indexar esto tambien 
     return  response()->json([
         "dirs"=>$dirs,
         "docs"=>$docs
@@ -184,7 +184,10 @@ if($folder)
         ]);
         DB::commit();
   //  Log::info(Auth::user()->name ." subio el archivo: ".  $request->documentName ." a las " . $this->now);   
+       $end = microtime(true);
+        $executionTime = $end - $start;
         
+        Log::info("El tiempo de ejecucion de la subida del archivo fue: " . $executionTime . " segundos"); 
       return response()->json(['message' => 'Documento subido correctamente']);
     } catch (Exception $e) {
         DB::rollBack();

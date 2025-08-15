@@ -102,11 +102,12 @@ public function showDocs($thisDir)
         "folderName"=>$folderName ,
         "parentFolder" =>$parentFolder,
         "type"=>$type,
-        "important"=> "3",
+        "important"=> $important,
      ]);
      if ($isRoot)
      {
-         Storage::disk('estudioLegal')->makeDirectory($newFolder->id);
+         //Storage::disk('estudioLegal')->makeDirectory($newFolder->id);
+         Storage::disk('private')->makeDirectory($newFolder->id);
      }else
      {
 $results = DB::select("

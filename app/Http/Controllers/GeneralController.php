@@ -152,8 +152,8 @@ public function uploadDoc(Request $request,$thisDir)
       $request->validate([
          "important"=>"required|integer|in:1,2,3",
          "description"=>"required|string|filled",
-         "judge"=>"string",
-         "isSensitive"=>"boolean",
+        "judge" => "nullable|string",
+       "isSensitive" => "nullable|boolean",
          'file' => 'required|file|max:1992294', //20MB
       ]);  
   DB::beginTransaction();

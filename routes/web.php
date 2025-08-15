@@ -13,6 +13,7 @@ Route::get('/', function () {
 
     Route::get("/dirs/{type}",[GeneralController::class, 'showDirs']);
     Route::get("/thisDir/{thisDir}",[GeneralController::class, 'showThisDir']);
+    Route::get("/docsInThisDir/{thisDir}",[GeneralController::class, 'showDocs']);
     Route::post("/makeDir",[GeneralController::class, 'makeDir']);
     Route::post("/uploadDoc/{thisDir}",[GeneralController::class, 'uploadDoc']);
     Route::get("/downloadDoc/{thisDoc}",[GeneralController::class, 'downloadDoc']);

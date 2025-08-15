@@ -22,11 +22,10 @@ try
         $googleUser = Socialite::driver('google')->stateless()->user();
         $user = User::where("email",$googleUser->getEmail())->first(); 
         if (!$user || $user->banned == 1)
-            {
-                
+            {   
                 return abort(401,"Correo no Autorizado");
             }
-            $token = $user->createToken("auth_token")->plainTextToken;  
+            $user->createToken("auth_token")->plainTextToken;  
             
        //Log::info($user->name ." ingreso a la plataforma el dia: " . now()->format('H:i d/m/Y'));
      

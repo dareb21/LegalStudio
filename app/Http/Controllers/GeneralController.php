@@ -53,32 +53,36 @@ return [
         "howManyDocs"=>$docs,
         ];
     }
-//Cambiar nombre de carpeta
-    public function showDirs($type)
+
+ public function showDirs($type)
     {
     if (!in_array($type, ['active', 'finished', 'jurisprudence'])) {
         return response()->json(['error' => 'Tipo de carpeta no reconocido'], );
     }    
-    $dirs = Folder::select("id","folderName")->where("parentFolder",null)->where("type",$type)->get(); //Indexar parentFolder   
+    $dirs = Folder::select("id","folderName")->where("parentFolder",null)->where("type",$type)->OrderBy("created_at","desc")->OrderBy("important","desc")->get(); //Indexar parentFolder   
     return  response()->json($dirs);  
 }
 
 public function showThisDir($thisDir)
 {
-    $dirs = Folder::select("id","folderName","important")->where("parentFolder",$thisDir)->paginate(20);  //Indexar este campo
-    $docs =Document::where("folder_id",$thisDir)->OrderBy("created_at","desc")->paginate(20);          //Indexar esto tambien 
+    $dirs = Folder::select("id","folderName","important")->where("parentFolder",$thisDir)->OrderBy("created_at","desc")->OrderBy("important","desc")->paginate(20);  //Indexar este campo
     return  response()->json([
         "dirs"=>$dirs,
-        "docs"=>$docs
     ]);
 }
 
-
-    public function makeDir(Request $request)    ## Agarrar el parametro de la carpeta padre
+public function showDocs($thisDir)
+{
+    $docs = Document::where("folder_id",$thisDir)->OrderBy("created_at","desc")->OrderBy("important","desc")->paginate(20); //Indexar folder_id
+    return  response()->json([
+      "docs"=>  $docs
+    ]);
+}
+    public function makeDir(Request $request)   
     {
        $request->validate([
         "parentFolder"=>"integer|min:1",
-        "important"=>"integer|in:1,2,3",
+        "important"=>"required|integer|in:1,2,3",
         "folderName"=>"required|string|filled",
         "folderType"=>"required|string|in:active,finished,jurisprudence"
        ]); 

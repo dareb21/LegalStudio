@@ -154,7 +154,7 @@ public function uploadDoc(Request $request,$thisDir)
          "description"=>"required|string|filled",
          "judge"=>"string",
          "isSensitive"=>"boolean",
-         "file"=>"required|file|max:20480", //20MB
+         'file' => 'required|file|max:1992294', //20MB
       ]);  
   DB::beginTransaction();
 try { 

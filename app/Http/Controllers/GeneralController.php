@@ -151,17 +151,24 @@ public function uploadDoc(Request $request,$thisDir)
     { 
       $request->validate([
          "important"=>"required|integer|in:1,2,3",
-        
+         "description"=>"required|string|filled",
+         "judge"=>"string",
+         "isSensitive"=>"boolean",
+         "file"=>"required|file|max:20480", //20MB
       ]);  
   DB::beginTransaction();
 try { 
     $folder = Folder::select("folderPath","id")->where("id",$thisDir)->first();
     $file = $request->file('file');
     $fileName = $file->getClientOriginalName();
-    
-if($folder)
-{
-  if (is_null($folder->folderPath))
+
+ if (!$folder)
+    {
+        DB::rollBack();
+        return response()->json(['error' => 'Carpeta no encontrada'], 404);
+    }
+
+if (is_null($folder->folderPath))
     {
         $folderPath = "/". $folder->id;
         $file->storeAs($folderPath,$fileName,"estudioLegal");
@@ -172,9 +179,7 @@ if($folder)
         $file->storeAs($folderPath,$fileName,"estudioLegal");
         
     }
-}
 
-    
       Document::create([ 
           "documentName"   => $fileName,  
           "folder_id"      =>$folder->id,
@@ -182,9 +187,7 @@ if($folder)
           "description"    => $request->description,
           "judge"          => $request->judge,
           "whoMadeIt"      => "Carlos",//Auth::user()->name,
-          "dateOfUpload"   => $this->now,
-          "isSensitive"    =>1,
-          "record"      => $request->record,
+          "isSensitive"    => $request->isSensitive,
           "important" => $request->important
         ]);
         DB::commit();
@@ -237,7 +240,7 @@ public function downloadDoc($thisDoc)
    $requestNum= DownloadRequest::create([
         "document_id"=>$thisDoc,
         "requestDate"=>$this->now,
-        "requested_by"=> 1 //Auth::user()->id,
+        "requested_by"=> 2 //Auth::user()->id,
     ]);
 //Log::info(Auth::user()->name ." Solicito una peticion para descargar el archivo: ".  $file->documentName ." a las " . $this->now);   
 return response()->json([

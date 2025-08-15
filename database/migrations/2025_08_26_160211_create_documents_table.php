@@ -16,16 +16,11 @@ return new class extends Migration
             $table->string("documentName");
             $table->foreignId('folder_id')->constrained();
             $table->text("folderPath");
-            $table->text("description")->nullable();
+            $table->text("description"); //posiblemente nullable
             $table->string("judge")->nullable();
             $table->string("whoMadeIt");
-            $table->dateTime("dateOfUpload");
             $table->boolean("isSensitive")->default(0);
             $table->tinyInteger("important")->default(3);;
-            $table->string("photo")->nullable();
-            $table->string("record")->nullable();
-            //$table->unsignedBigInteger('record_id');
-            //$table->foreign('record_id')->references('id')->on('records');
             $table->timestamps();
             $table->softDeletes();
             $table->dateTime("hardDelete")->nullable();

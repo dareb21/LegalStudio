@@ -24,7 +24,9 @@ class LaywerController extends Controller
          ->join("users","download_requests.requested_by","=","users.id")
          ->select("download_requests.id as requestId","documents.id as docId","documents.documentName as docName","users.name as userName","download_requests.requestDate as dateRequest")
          ->paginate(10);
-    return response()->json($petition);
+    return response()->json([
+    "petitions" =>   $petition
+    ]);
     }
 
     public function replyRequest(DownloadRequest $thisRequest, Request $request)
@@ -32,15 +34,14 @@ class LaywerController extends Controller
         $request->validate([
            "reply"=>"required|boolean"
         ]);
+        $status = $request->reply ? "aprobada":"rechazada";
 
         $thisRequest->update([
-            "status"=>$request->reply,
-            "responded_by"=>Auth::id(),
-            "responseDate"=>now()
+            "status"=>$status,
+            "responded_by"=>1, // Assuming 1 is the ID of the admin or the user responding
+            "responseDate"=>$this->now
         ]);
 
-        $status = $request->reply ? "aprobada":"rechazada";
-        
         //Log::info(Auth::user()->name ." dio como  ". $status ." la solicitud. " . $this->now);  
         
     return response()->json("Solicitud ".$status);

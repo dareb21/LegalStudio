@@ -202,26 +202,36 @@ if (is_null($folder->folderPath))
 
 public function downloadDoc($thisDoc)
 {
-    $docInfo=Document::where("id",$thisDoc)->select("isSensitive","documentName","folderPath")->first();
-     $path =ltrim($docInfo->folderPath . "/" . $docInfo->documentName);
+ $docInfo=Document::where("id",$thisDoc)->select("isSensitive","documentName","folderPath")->first();
+ $path =ltrim($docInfo->folderPath . "/" . $docInfo->documentName);
+   
+//Hacer endpoint para descargar documentos PARA ABOGADOS 
+/*if (Laywer::where("user_id",Auth::user()->id )->exists())
+   {
+        return Storage::disk("estudioLegal")->download($path);
+   }
+*/
     if ($docInfo->isSensitive == 0)
     {   
     //    Log::info(Auth::user()->name ." descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
          return Storage::disk("estudioLegal")->download($path);    
     }
 
-    $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by",1)->orderBy('created_at', 'desc')->first();
+$petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by",1)->orderBy('created_at', 'desc')->first();
 
     if (!$petition)
     {
-    //Log::info(Auth::user()->name ."intento  descargar el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
-     return response()->json("Para este documento se ocupa permisos de descarga, favor solicite un permiso");  
-
+    //Log::info(Auth::user()->name ."intento  descargar el archivo: ".  $docInfo->documentName ." a las " . $this->now);        
+        return response()->json([
+           "status"=> "Para este documento se ocupa permisos de descarga, favor solicite un permiso"
+        ]);
     }
 
     if (is_null($petition->status))
     {
-        return response()->json("Su solicitud aun esta en proceso.");
+        return response()->json([
+           "status"=> "Su solicitud aun esta en proceso"
+        ]);
     }
 
     if ( $petition->status==1)
@@ -229,13 +239,15 @@ public function downloadDoc($thisDoc)
       //  Log::info(Auth::user()->name ." obtuvo permiso y descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);  
     return Storage::disk("estudioLegal")->download($path);         
     }else
-    {
-        return response()->json("Lo sentimos, su peticion de descarga fue rechazada. Intente en un futuro");
+    {      
+        return response()->json([
+           "status"=> "Lo sentimos, su peticion de descarga fue rechazada. Intente en un futuro"
+        ]);
     }    
 }
 
  public function downloadRequest($thisDoc)
-{
+{ 
    $file = Document::select("documentName")->where("id",$thisDoc)->first(); 
    $requestNum= DownloadRequest::create([
         "document_id"=>$thisDoc,

@@ -248,7 +248,12 @@ $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by"
 
  public function downloadRequest($thisDoc)
 { 
-   $file = Document::select("documentName")->where("id",$thisDoc)->first(); 
+    if (downloadRequest::where("document_id",$thisDoc)->where("requested_by",1)->whereNull("status")->exists())
+    {
+        return response()->json([
+           "statusP"=>"Ya existe una solicitud pendiente para este documento"
+        ]);
+    }
    $requestNum= DownloadRequest::create([
         "document_id"=>$thisDoc,
         "requestDate"=>$this->now,

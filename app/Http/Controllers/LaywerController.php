@@ -35,17 +35,18 @@ class LaywerController extends Controller
         $request->validate([
            "reply"=>"required|boolean"
         ]);
-        $status = $request->reply ? "aprobada":"rechazada";
-
+      
         $thisRequest->update([
-            "status"=>$status,
+            "status"=>$request->reply,
             "responded_by"=>2, 
             "responseDate"=>$this->now
         ]);
-
+      $status = $request->reply ? "aprobada":"rechazada";
         //Log::info(Auth::user()->name ." dio como  ". $status ." la solicitud. " . $this->now);  
         
-    return response()->json("Solicitud ".$status);
+    return response()->json([
+        "statusP" => "Su solicitud fue ". $status,
+    ]);
     }
 
     public function deleteDoc($thisDoc)

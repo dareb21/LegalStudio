@@ -154,7 +154,7 @@ public function uploadDoc(Request $request,$thisDir)
          "description"=>"required|string|filled",
         "judge" => "nullable|string",
        "isSensitive" => "nullable|boolean",
-         'file' => 'required|file|max:1992294', //20MB
+         'file' => 'required|file|max:1992294',  
       ]);  
   DB::beginTransaction();
 try { 
@@ -210,7 +210,7 @@ public function downloadDoc($thisDoc)
          return Storage::disk("estudioLegal")->download($path);    
     }
 
-    $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by",Auth::user()->id)->orderBy('created_at', 'desc')->first();
+    $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by",1)->orderBy('created_at', 'desc')->first();
 
     if (!$petition)
     {
@@ -240,7 +240,7 @@ public function downloadDoc($thisDoc)
    $requestNum= DownloadRequest::create([
         "document_id"=>$thisDoc,
         "requestDate"=>$this->now,
-        "requested_by"=> 2 //Auth::user()->id,
+        "requested_by"=> 1 //Auth::user()->id,
     ]);
 //Log::info(Auth::user()->name ." Solicito una peticion para descargar el archivo: ".  $file->documentName ." a las " . $this->now);   
 return response()->json([

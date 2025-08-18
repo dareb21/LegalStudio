@@ -28,8 +28,9 @@ class DeleteJob implements ShouldQueue
      */
     public function handle(): void
     {
-  $dirs = Folder::withTrashed()->whereNotNull("hardDelete")->select("folderPath","id")->get();
-  $docs = Document::withTrashed()
+     //$docs = Document::withTrashed()->whereNotNull("hardDelete")->select("folderPath")->chunk(500, function )
+
+  /*$docs = Document::withTrashed()
                   ->join("folders","documents.folder_id","=","folders.id")
                   ->select("folders.filePath as filePath")
                   ->whereNotNull("hardDelete")
@@ -47,5 +48,6 @@ class DeleteJob implements ShouldQueue
     }
    
 }
+    */
   }
 }

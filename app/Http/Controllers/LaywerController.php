@@ -38,7 +38,7 @@ class LaywerController extends Controller
 
         $thisRequest->update([
             "status"=>$status,
-            "responded_by"=>1, // Assuming 1 is the ID of the admin or the user responding
+            "responded_by"=>2, 
             "responseDate"=>$this->now
         ]);
 

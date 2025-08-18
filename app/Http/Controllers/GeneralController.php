@@ -223,14 +223,14 @@ $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by"
     {
     //Log::info(Auth::user()->name ."intento  descargar el archivo: ".  $docInfo->documentName ." a las " . $this->now);        
         return response()->json([
-           "status"=> "Para este documento se ocupa permisos de descarga, favor solicite un permiso"
+           "statusP"=> "Para este documento se ocupa permisos de descarga, favor solicite un permiso"
         ]);
     }
 
     if (is_null($petition->status))
     {
         return response()->json([
-           "status"=> "Su solicitud aun esta en proceso"
+           "statusP"=> "Su solicitud aun esta en proceso"
         ]);
     }
 
@@ -241,7 +241,7 @@ $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by"
     }else
     {      
         return response()->json([
-           "status"=> "Lo sentimos, su peticion de descarga fue rechazada. Intente en un futuro"
+           "statusP"=> "Lo sentimos, su peticion de descarga fue rechazada. Intente en un futuro"
         ]);
     }    
 }

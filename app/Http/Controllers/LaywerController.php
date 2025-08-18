@@ -23,6 +23,7 @@ class LaywerController extends Controller
       $petition =  DownloadRequest::join("documents","download_requests.document_id","=","documents.id")
          ->join("users","download_requests.requested_by","=","users.id")
          ->select("download_requests.id as requestId","documents.id as docId","documents.documentName as docName","users.name as userName","download_requests.requestDate as dateRequest")
+         ->orderBy("download_requests.requestDate","desc")
          ->paginate(10);
     return response()->json([
     "petitions" =>   $petition

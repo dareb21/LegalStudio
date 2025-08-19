@@ -72,6 +72,7 @@ class LaywerController extends Controller
           ->join("folders","documents.folder_id","=","folders.id")
           ->whereNull("folders.hardDelete")
           ->where("folders.type",$dirType)
+          ->select("documents.id as docId","documents.documentName as docName","documents.description as docDesc","documents.whoMadeIt as whoUpload","documents.isSensitive","documents.deleted_at as deletedAt","documents.important","documents.judge")
           ->paginate(10);  
         $folder =Folder::onlyTrashed()->where("type",$dirType)->where("hardDelete",null)->paginate(10);
 

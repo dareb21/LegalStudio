@@ -30,7 +30,7 @@ Route::get('/', function () {
         Route::patch('/replyRequest/{thisRequest}', [LaywerController::class, 'replyRequest']);
         Route::delete('/deleteDoc/{thisDoc}', [LaywerController::class, 'deleteDoc']);
         Route::delete('/deleteDir/{thisDir}', [LaywerController::class, 'deleteDir']);
-        Route::get('/recycle', [LaywerController::class, 'recycleCan']);
+        Route::get('/recycle/{dirType}', [LaywerController::class, 'recycleCan']);
         Route::patch('/restore/{thisDoc}', [LaywerController::class, 'restoreDoc']);
         Route::patch('/restoreDir/{thisDir}', [LaywerController::class, 'restoreDir']);
         Route::patch('/finished/{thisDir}', [LaywerController::class, 'finishThisCase']);

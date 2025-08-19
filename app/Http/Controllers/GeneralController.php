@@ -132,7 +132,8 @@ foreach ($results as $item)
 $fullPath = $path. $newFolder->id;
 $newFolder->folderPath=$fullPath;
 $newFolder->save();
-Storage::disk('estudioLegal')->makeDirectory($fullPath);
+//Storage::disk('estudioLegal')->makeDirectory($fullPath);
+ Storage::disk('private')->makeDirectory($fullPath);
 }
 /*Logger::create([
     "user_id" => Auth::id(),
@@ -171,15 +172,12 @@ try {
 if (is_null($folder->folderPath))
     {
         $folderPath = "/". $folder->id;
-        $file->storeAs($folderPath,$fileName,"estudioLegal");
-        
     }else
     {
         $folderPath = $folder->folderPath;
-        $file->storeAs($folderPath,$fileName,"estudioLegal");
-        
     }
-
+//$file->storeAs($folderPath,$fileName,"estudioLegal");private
+$file->storeAs($folderPath,$fileName,"private");
       Document::create([ 
           "documentName"   => $fileName,  
           "folder_id"      =>$folder->id,

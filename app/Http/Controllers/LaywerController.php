@@ -66,10 +66,14 @@ class LaywerController extends Controller
     return response()->json("La carpeta se mando a la bandeja de reciclaje");
     }
 
-    public function recycleCan()
-    {
-        $documents =Document::onlyTrashed()->where("hardDelete",null)->paginate(10);
-        $folder =Folder::onlyTrashed()->where("hardDelete",null)->paginate(10);
+    public function recycleCan($dirType)
+        {
+          $documents =Document::onlyTrashed()
+          ->join("folders","documents.folderPath","=","folders.folderPath")
+          ->where("hardDelete",null)
+          ->where("folders.type",$dirType)
+          ->paginate(10);  
+        $folder =Folder::onlyTrashed()->where("type",$dirType)->where("hardDelete",null)->paginate(10);
 
     return response()->json([
             "documents"=>$documents,

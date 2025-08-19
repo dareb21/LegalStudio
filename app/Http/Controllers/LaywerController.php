@@ -69,8 +69,8 @@ class LaywerController extends Controller
     public function recycleCan($dirType)
         {
           $documents =Document::onlyTrashed()
-          ->join("folders","documents.folderPath","=","folders.folderPath")
-          ->where("hardDelete",null)
+          ->join("folders","documents.folder_id","=","folders.id")
+          ->whereNull("folders.hardDelete")
           ->where("folders.type",$dirType)
           ->paginate(10);  
         $folder =Folder::onlyTrashed()->where("type",$dirType)->where("hardDelete",null)->paginate(10);

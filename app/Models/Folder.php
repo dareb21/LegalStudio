@@ -13,7 +13,8 @@ class Folder extends Model
       "folderPath", 
       "type",
       "important",
-      "hardDelete"
+      "hardDelete",
+      "deleted_by"
     ];
     
 }

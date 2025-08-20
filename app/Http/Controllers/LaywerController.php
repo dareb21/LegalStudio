@@ -139,4 +139,11 @@ Logger::create([
     return response()->json("Su caso paso a cerrado");
     }
 
+public function logs()
+{
+    $logs = Logger::paginate(30);
+    return response()->json([
+        "logs" => $logs
+    ]);
+}
 }

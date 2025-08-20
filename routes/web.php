@@ -34,6 +34,6 @@ Route::get('/', function () {
         Route::patch('/restore/{thisDoc}', [LaywerController::class, 'restoreDoc']);
         Route::patch('/restoreDir/{thisDir}', [LaywerController::class, 'restoreDir']);
         Route::patch('/finished/{thisDir}', [LaywerController::class, 'finishThisCase']);
-
+        Route::get('/logs', [LaywerController::class, 'logs']);    
         Route::get("/home",[GeneralController::class, 'home']);
     

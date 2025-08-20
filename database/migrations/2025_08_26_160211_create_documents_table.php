@@ -23,6 +23,7 @@ return new class extends Migration
             $table->tinyInteger("important")->default(3);;
             $table->timestamps();
             $table->softDeletes();
+            $table->foreignId('deleted_by')->constrained('users');
             $table->dateTime("hardDelete")->nullable();
             
         });

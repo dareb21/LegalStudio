@@ -20,6 +20,7 @@ class Document extends Model
     "record",
     "important",
     "hardDelete",
-    "folderPath"
+    "folderPath",
+    "deleted_by"
     ];
 }

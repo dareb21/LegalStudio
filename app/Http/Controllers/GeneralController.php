@@ -107,9 +107,9 @@ public function showDocs($thisDir)
      ]);
      if ($isRoot)
      {
-         //Storage::disk('estudioLegal')->makeDirectory($newFolder->id);
-         Storage::disk('private')->makeDirectory($newFolder->id);
-         $logPath = "/". $newFolder->id;
+         Storage::disk('estudioLegal')->makeDirectory($newFolder->id);
+         //Storage::disk('private')->makeDirectory($newFolder->id);
+         
      }else
      {
 $results = DB::select("
@@ -134,9 +134,8 @@ foreach ($results as $item)
 $fullPath = $path. $newFolder->id;
 $newFolder->folderPath=$fullPath;
 $newFolder->save();
-//Storage::disk('estudioLegal')->makeDirectory($fullPath);
- Storage::disk('private')->makeDirectory($fullPath);
- $logPath= $fullPath;
+Storage::disk('estudioLegal')->makeDirectory($fullPath);
+// Storage::disk('private')->makeDirectory($fullPath);
 }
 switch ($type) {
     case 'active':
@@ -188,8 +187,8 @@ if (is_null($folder->folderPath))
     {
         $folderPath = $folder->folderPath;
     }
-//$file->storeAs($folderPath,$fileName,"estudioLegal");
-$file->storeAs($folderPath,$fileName,"private");
+$file->storeAs($folderPath,$fileName,"estudioLegal");
+//$file->storeAs($folderPath,$fileName,"private");
       Document::create([ 
           "documentName"   => $fileName,  
           "folder_id"      =>$folder->id,
@@ -245,7 +244,6 @@ public function downloadDoc($thisDoc)
     if ($docInfo->isSensitive == 0)
     {   
 
-    //    Log::info(Auth::user()->name ." descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
     Logger::create([
     "who" => 1,
     "details" => "Carlos descargo el documento " . $docInfo->documentName . " a las " . $this->now,

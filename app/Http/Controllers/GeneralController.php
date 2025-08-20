@@ -6,6 +6,7 @@ use  App\Models\Folder;
 use App\Models\Document;
 use App\Models\DownloadRequest;
 use App\Jobs\DeleteJob;
+use App\Models\Logger;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -108,6 +109,7 @@ public function showDocs($thisDir)
      {
          //Storage::disk('estudioLegal')->makeDirectory($newFolder->id);
          Storage::disk('private')->makeDirectory($newFolder->id);
+         $logPath = "/". $newFolder->id;
      }else
      {
 $results = DB::select("
@@ -134,16 +136,26 @@ $newFolder->folderPath=$fullPath;
 $newFolder->save();
 //Storage::disk('estudioLegal')->makeDirectory($fullPath);
  Storage::disk('private')->makeDirectory($fullPath);
+ $logPath= $fullPath;
 }
-/*Logger::create([
-    "user_id" => Auth::id(),
-    "action" => "Creo una carpeta".,
-    "details" => Auth::users()->name . " creo una carpeta llamada " . $folderName . " del tipo " . $type . " a las " . $this->now,
-    "timestamp" => now()
-]);*/
-//Log::info(Auth::user()->name ." Creo la carpeta: ".  $folderName ." a las " . $this->now);   
-
-     return response()->json("Carpeta Creada con exito");
+switch ($type) {
+    case 'active':
+        $logType = 'casos activos';
+        break;
+    case 'finished':
+        $logType = 'casos finalizados';
+        break;
+    case 'jurisprudence':
+        $logType = 'Jurisprudencia';
+        break;
+    default:
+        $logType = 'Carpeta Desconocida';
+}
+Logger::create([
+    "who" => 1,
+    "details" => "Juan Garcia creo una carpeta llamada " . $folderName . " del tipo " . $logType . " a las " . $this->now,
+]);
+ return response()->json("Carpeta Creada con exito");
     }
 
    
@@ -159,7 +171,7 @@ public function uploadDoc(Request $request,$thisDir)
       ]);  
   DB::beginTransaction();
 try { 
-    $folder = Folder::select("folderPath","id")->where("id",$thisDir)->first();
+    $folder = Folder::select("folderPath","id","type")->where("id",$thisDir)->first();
     $file = $request->file('file');
     $fileName = $file->getClientOriginalName();
 
@@ -176,7 +188,7 @@ if (is_null($folder->folderPath))
     {
         $folderPath = $folder->folderPath;
     }
-//$file->storeAs($folderPath,$fileName,"estudioLegal");private
+//$file->storeAs($folderPath,$fileName,"estudioLegal");
 $file->storeAs($folderPath,$fileName,"private");
       Document::create([ 
           "documentName"   => $fileName,  
@@ -189,7 +201,28 @@ $file->storeAs($folderPath,$fileName,"private");
           "important" => $request->important
         ]);
         DB::commit();
-  //  Log::info(Auth::user()->name ." subio el archivo: ".  $request->documentName ." a las " . $this->now);      
+
+
+switch ($folder->type) {
+    case 'active':
+        $logType = 'casos activos';
+        break;
+    case 'finished':
+        $logType = 'casos finalizados';
+        break;
+    case 'jurisprudence':
+        $logType = 'Jurisprudencia';
+        break;
+    default:
+        $logType = 'Carpeta Desconocida';
+}
+
+
+Logger::create([
+    "who" => 1,
+    "details" => "Carlos subio el documento " . $fileName . " a las " . $this->now." en el area " . $logType,
+]);
+    
              return response()->json(['message' => 'Documento subido correctamente']);
     } catch (Exception $e) {
         DB::rollBack();
@@ -211,15 +244,25 @@ public function downloadDoc($thisDoc)
 */
     if ($docInfo->isSensitive == 0)
     {   
+
     //    Log::info(Auth::user()->name ." descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);      
-         return Storage::disk("estudioLegal")->download($path);    
+    Logger::create([
+    "who" => 1,
+    "details" => "Carlos descargo el documento " . $docInfo->documentName . " a las " . $this->now,
+]);
+    
+    return Storage::disk("estudioLegal")->download($path);    
     }
 
 $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by",1)->orderBy('created_at', 'desc')->first();
 
     if (!$petition)
     {
-    //Log::info(Auth::user()->name ."intento  descargar el archivo: ".  $docInfo->documentName ." a las " . $this->now);        
+        Logger::create([
+    "who" => 1,
+    "details" => "Carlos intento descargar el documento " . $docInfo->documentName . " a las " . $this->now,
+]);
+
         return response()->json([
            "statusP"=> "Para este documento se ocupa permisos de descarga, favor solicite un permiso"
         ]);
@@ -233,11 +276,18 @@ $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by"
     }
 
     if ( $petition->status==1)
-    {
-      //  Log::info(Auth::user()->name ." obtuvo permiso y descargo el archivo: ".  $docInfo->documentName ." a las " . $this->now);  
+    {Logger::create([
+    "who" => 1,
+    "details" => "Carlos descargo el documento " . $docInfo->documentName . " a las " . $this->now,
+]);
+
     return Storage::disk("estudioLegal")->download($path);         
     }else
-    {      
+    {    Logger::create([
+    "who" => 1,
+    "details" => "Carlos intento descargar el documento " . $docInfo->documentName . " a las " . $this->now." pero su solicitud fue rechazada",
+]);
+  
         return response()->json([
            "statusP"=> "Lo sentimos, su peticion de descarga fue rechazada. Intente en un futuro"
         ]);
@@ -257,8 +307,13 @@ $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by"
         "requestDate"=>$this->now,
         "requested_by"=> 1 //Auth::user()->id,
     ]);
-//Log::info(Auth::user()->name ." Solicito una peticion para descargar el archivo: ".  $file->documentName ." a las " . $this->now);   
-return response()->json([
+Logger::create([
+    "who" => 1,
+    "details" => "Carlos solicito la descarga del documento con id " . $thisDoc . " a las " . $this->now." con el numero de solicitud " . $requestNum->id,
+]);
+
+
+    return response()->json([
     "status"=>"Solicitud procesada con exito",
 "Numero de solicitud"=>$requestNum->id,
 ]);

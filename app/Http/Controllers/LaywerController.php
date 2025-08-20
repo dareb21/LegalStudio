@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\DownloadRequest;
 use App\Models\Document;
 use App\Models\Folder;
+use App\Models\Logger;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -42,8 +43,11 @@ class LaywerController extends Controller
             "responded_by"=>2, 
             "responseDate"=>$this->now
         ]);
-      $status = $request->reply ? "aprobada":"rechazada";
-        //Log::info(Auth::user()->name ." dio como  ". $status ." la solicitud. " . $this->now);  
+      $status = $request->reply ? "aprobo":"rechazo";
+   Logger::create([
+    "who" => 2,
+    "details" => "Pedro Garcia ". $status  . "la solicitud numero" . $thisRequest->id . " a las " . $this->now,
+]);
         
     return response()->json([
         "statusP" => "Su solicitud fue ". $status,
@@ -52,17 +56,31 @@ class LaywerController extends Controller
 
     public function deleteDoc($thisDoc)
     {
-        $doc= Document::find($thisDoc)->delete();
-        //Log::info(Auth::user()->name ." borro el archivo  ". $doc->documentName ." a las: " . $this->now);      
-    
-    return response()->json("El archivo se mando a la bandeja de reciclaje");
+        $doc= Document::findOrFail($thisDoc);
+        //$doc->deleted_by = 1; //Auth::user()->name;
+        $docName = $doc->documentName; 
+        $doc->save(); 
+        $doc->delete();
+   Logger::create([
+    "who" => 1,
+    "details" => "Carlos Palma elimino el documento ". $docName  .  " a las " . $this->now,
+]);
+   
+        return response()->json("El archivo se mando a la bandeja de reciclaje");
     }
 
     public function deleteDir($thisDir)
     {
-        $dir =Folder::find($thisDir);
+        $dir =Folder::findOrFail($thisDir);
+        //$dir->deleted_by = 1; //Auth::user()->name;
+        $dirName = $dir->folderName;
+        $dir->save();
         $dir->delete();
-        //Log::info(Auth::user()->name ." borro la carpeta  ". $dir->folderName ." a las: " . $this->now);      
+Logger::create([
+    "who" => 1,
+    "details" => "Carlos Palma elimino la carpeta ". $dirName  .  " a las " . $this->now,
+]);
+         
     return response()->json("La carpeta se mando a la bandeja de reciclaje");
     }
 
@@ -84,18 +102,29 @@ class LaywerController extends Controller
 
     public function restoreDoc($thisDoc)
     {
-        $folder = Document::withTrashed()->find($thisDoc);
-        $folder->restore();
-        //Log::info(Auth::user()->name ." restauro el documento ".  $folder->folderName ." a las " . $this->now);   
+        $doc = Document::withTrashed()->find($thisDoc);
+        $docName = $doc->documentName;
+        $doc->deleted_by = null;
+        $doc->save();
+        $doc->restore();
+Logger::create([
+    "who" => 1,
+    "details" => "Carlos restauro el documento ". $docName  .  " a las " . $this->now,
+]);
     return response()->json("Archivo restaurado");
     }
 
     public function restoreDir($thisDir)
     {
         $folder=Folder::withTrashed()->find($thisDir);
+        $folderName = $folder->folderName;
+        $folder->deleted_by = null;
+        $folder->save();
         $folder->restore();  
-        //Log::info(Auth::user()->name ." restauro la carpeta ".  $folder->folderName ." a las " . $this->now);   
-    return response()->json("Carpeta restaurada");
+   Logger::create([
+    "who" => 1,
+    "details" => "Carlos restauro la carpeta ". $folderName  .  " a las " . $this->now,
+]); return response()->json("Carpeta restaurada");
     }
 
     public function finishThisCase(Folder $thisDir)
@@ -103,7 +132,10 @@ class LaywerController extends Controller
         $thisDir->update([
             "type"=>"finished"
         ]);
-        //Log::info(Auth::user()->name ." cerrô el caso ".  $thisDir->folderName ." a las " . $this->now);   
+      Logger::create([
+    "who" => 1,
+    "details" => "Cerro el caso ". $thisDir->folderName  .  " a las " . $this->now,
+]);  
     return response()->json("Su caso paso a cerrado");
     }
 

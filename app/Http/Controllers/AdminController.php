@@ -17,23 +17,18 @@ class AdminController extends Controller
 
     public function showUsers()
     {
-    return response()->json(User::paginate(10));
+    return response()->json(User::where("banned",0)->paginate(10));
     }
 
     public function banThisUser($userId)
     {
-     
-        $user = User::select("name")->where("id",$userId)->first();   
-        User::where("id", $userId)->update(["banned" => 1]);
-        //Log::info(Auth::user()->name ." bloqueo a ". $user->name ." a las " . $this->now);    
+        User::where("id", $userId)->update(["banned" => 1]); 
     return response()->json("Usuario bloqueado con exito");
     }
 
     public function unBanThisUser($userId)
     {
-        $user = User::select("name")->where("id",$userId)->first();
         User::where("id", $userId)->update(["banned" => 0]);
-        //Log::info(Auth::user()->name ." desbloqueo a ". $user->name ." a las " . $this->now);  
     return response()->json("Usuario desbloqueado con exito");
     }
 
@@ -46,8 +41,6 @@ class AdminController extends Controller
             "phone" => "required|size:8",
             "role" => "required|in:abogado,asistente", 
         ]);
-
-        
              User::create([
                  "name"=> $request->name,
                 "birthday"=>$request->birthday,
@@ -61,7 +54,22 @@ class AdminController extends Controller
 
 public function editUser(Request $request,$userId)
 {
-
+        $request->validate([
+            "name" => "required|string|min:5",
+            "birthday" => "required|date|before:today",
+            "email" => "required|unique:users,email",
+            "phone" => "required|size:8",
+            "role" => "required|in:abogado,asistente", 
+        ]);
+        User::where("id", $userId)->update([
+          "name"=> $request->name,
+                "birthday"=>$request->birthday,
+                "email"=>$request->email,
+                "phone"=>$request->phone,
+                "role"=>$request->role,
+        ]);
+return response()->json("Usuario actualizado con exito!"); 
+  
 }
 
 public function viewLogs()

@@ -23,9 +23,9 @@ Route::get('/', function () {
         Route::post('/newUser', [AdminController::class, 'newUser']);
         Route::patch('/banThisUser/{userId}', [AdminController::class, 'banThisUser']);
         Route::patch('/unBanThisUser/{userId}', [AdminController::class, 'unBanThisUser']);
-        //ver logs
+        //ver todos los logs
         //Editar
-
+       
         Route::get('/seeRequest', [LaywerController::class, 'seeRequest']);   
         Route::patch('/replyRequest/{thisRequest}', [LaywerController::class, 'replyRequest']);
         Route::delete('/deleteDoc/{thisDoc}', [LaywerController::class, 'deleteDoc']);

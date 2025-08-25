@@ -47,7 +47,7 @@ class AdminController extends Controller
             "role" => "required|in:abogado,asistente", 
         ]);
 
-        try {
+        
              User::create([
                  "name"=> $request->name,
                 "birthday"=>$request->birthday,
@@ -58,10 +58,6 @@ class AdminController extends Controller
         //Log::info(Auth::user()->name ." creo un nuevo usuario bajo el nombre de  ". $request->name ."y le asigno el rol de ". $request->role. ". " . $this->now);      
     return response()->json("Usuario creado con exito!"); 
     } 
-    catch (Exception $e) {
-    return response()->json("Ha ocurrido en error al crear el usuario, intente nuevamente.");
-    }
-}
 
 public function editUser(Request $request,$userId)
 {

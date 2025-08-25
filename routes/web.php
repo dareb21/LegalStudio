@@ -23,8 +23,9 @@ Route::get('/', function () {
         Route::post('/newUser', [AdminController::class, 'newUser']);
         Route::patch('/banThisUser/{userId}', [AdminController::class, 'banThisUser']);
         Route::patch('/unBanThisUser/{userId}', [AdminController::class, 'unBanThisUser']);
-        Route::put('/editUser', [AdminController::class, 'editUser']);
-        //ver todos los logs
+        Route::put('/editUser/{userId}', [AdminController::class, 'editUser']);
+       Route::get('/seeBans', [AdminController::class, 'seeBans']);
+         //ver todos los logs
         //Editar
        
         Route::get('/seeRequest', [LaywerController::class, 'seeRequest']);   
@@ -36,5 +37,6 @@ Route::get('/', function () {
         Route::patch('/restoreDir/{thisDir}', [LaywerController::class, 'restoreDir']);
         Route::patch('/finished/{thisDir}', [LaywerController::class, 'finishThisCase']);
         Route::get('/logs', [LaywerController::class, 'logs']);    
-        Route::get("/home",[GeneralController::class, 'home']);
-    
+        Route::put('/updateDir/{thisDir}', [LaywerController::class, 'updateDir']);  
+        Route::put('/updateDoc/{thisDoc}', [LaywerController::class, 'updateDoc']);  
+      

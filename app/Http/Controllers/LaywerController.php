@@ -146,4 +146,37 @@ public function logs()
         "logs" => $logs
     ]);
 }
+
+public function updateDir($thisDir, Request $request)
+{
+     $request->validate([
+           "folderName"=>"required|string|filled"
+        ]);
+    Folder::where("id",$thisDir)->update([
+    "folderName"=>$request->folderName,
+    ]);
+   return response()->noContent();
+}
+
+public function updateDoc($thisDoc, Request $request)
+{
+    $request->validate([
+        "documentName"=>"required|string|filled",
+        "isSensitive"=>"required|boolean",
+        "description"=>"required|string|filled",
+        "important"=>"required|integer|in:1,2,3",
+        "judge"=>"required|string|filled",
+    ]);
+
+   Document::where("id", $thisDoc)->update([
+          "documentName"=> $request->documentName,
+                "isSensitive"=>$request->isSensitive,
+                "description"=>$request->description,
+                "important"=>$request->important,
+                "judge"=>$request->judge,
+        ]);
+
+}
+
+
 }

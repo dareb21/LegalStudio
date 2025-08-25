@@ -32,6 +32,15 @@ class AdminController extends Controller
     return response()->json("Usuario desbloqueado con exito");
     }
 
+public function seeBans()
+{
+    $bans = User::where("banned",1)->paginate(10);
+    return response()->json([
+        "bans"=>$bans,
+    ]);
+}
+
+
     public function newUser(Request $request)
     {
         $request->validate([

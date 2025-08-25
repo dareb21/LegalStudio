@@ -39,6 +39,15 @@ class AdminController extends Controller
 
     public function newUser(Request $request)
     {
+        $request->validate([
+            "name" => "required|string|min:5",
+            "birthday" => "required|date|before:today",
+            "email" => "required|unique:users,email",
+            "phone" => "required|size:8",
+            "role" => "required|in:abogado,asistente", 
+        ]);
+
+        
              User::create([
                  "name"=> $request->name,
                 "birthday"=>$request->birthday,
@@ -46,6 +55,7 @@ class AdminController extends Controller
                 "phone"=>$request->phone,
                 "role"=>$request->role,
             ]);
+        //Log::info(Auth::user()->name ." creo un nuevo usuario bajo el nombre de  ". $request->name ."y le asigno el rol de ". $request->role. ". " . $this->now);      
     return response()->json("Usuario creado con exito!"); 
     } 
 

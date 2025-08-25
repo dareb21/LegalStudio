@@ -23,6 +23,7 @@ Route::get('/', function () {
         Route::post('/newUser', [AdminController::class, 'newUser']);
         Route::patch('/banThisUser/{userId}', [AdminController::class, 'banThisUser']);
         Route::patch('/unBanThisUser/{userId}', [AdminController::class, 'unBanThisUser']);
+        Route::put('/editUser', [AdminController::class, 'editUser']);
         //ver todos los logs
         //Editar
        

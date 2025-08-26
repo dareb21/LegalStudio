@@ -81,13 +81,13 @@ public function showDocs($thisDir)
 }
     public function makeDir(Request $request)   
     {
+        
        $request->validate([
         "parentFolder"=>"integer|min:1",
         "important"=>"required|integer|in:1,2,3",
         "folderName"=>"required|string|filled",
         "folderType"=>"required|string|in:active,finished,jurisprudence"
        ]); 
-    
     $isRoot = false;
     $folderName = $request->input('folderName');
     $parentFolder = $request->input('parentFolder');
@@ -107,8 +107,8 @@ public function showDocs($thisDir)
      ]);
      if ($isRoot)
      {
-         Storage::disk('estudioLegal')->makeDirectory($newFolder->id);
-         //Storage::disk('private')->makeDirectory($newFolder->id);
+         //Storage::disk('estudioLegal')->makeDirectory($newFolder->id);
+        Storage::disk('private')->makeDirectory($newFolder->id);
          
      }else
      {

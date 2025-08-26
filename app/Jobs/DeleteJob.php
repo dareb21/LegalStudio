@@ -28,7 +28,12 @@ class DeleteJob implements ShouldQueue
      */
     public function handle(): void
     {
-     //$docs = Document::withTrashed()->whereNotNull("hardDelete")->select("folderPath")->chunk(500, function )
+   Document::withTrashed()->whereNotNull("hardDelete")->select("folderPath","documentName")
+   ->chunk(200, function ($documents) {
+        foreach ($documents as $doc) {
+         Storage::disk('private')->delete($doc->folderPath."/".$doc->documentName);
+        }
+    });
 
   /*$docs = Document::withTrashed()
                   ->join("folders","documents.folder_id","=","folders.id")

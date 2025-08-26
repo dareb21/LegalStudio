@@ -160,22 +160,15 @@ public function updateDir($thisDir, Request $request)
 
 public function updateDoc($thisDoc, Request $request)
 {
-    $request->validate([
-        "documentName"=>"required|string|filled",
-        "isSensitive"=>"required|boolean",
-        "description"=>"required|string|filled",
-        "important"=>"required|integer|in:1,2,3",
-        "judge"=>"required|string|filled",
+   $validated=  $request->validate([
+        "documentName"=>"string|filled",
+        "isSensitive"=>"boolean",
+        "description"=>"string|filled",
+        "important"=>"integer|in:1,2,3",
+        "judge"=>"string|filled",
     ]);
-
-   Document::where("id", $thisDoc)->update([
-          "documentName"=> $request->documentName,
-                "isSensitive"=>$request->isSensitive,
-                "description"=>$request->description,
-                "important"=>$request->important,
-                "judge"=>$request->judge,
-        ]);
-
+Document::where('id', $thisDoc)->update($validated);
+  return response()->noContent();
 }
 
 

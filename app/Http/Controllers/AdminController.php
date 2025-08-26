@@ -43,14 +43,8 @@ public function seeBans()
 
     public function newUser(Request $request)
     {
-        $request->validate([
-            "name" => "required|string|min:5",
-            "birthday" => "required|date|before:today",
-            "email" => "required|unique:users,email",
-            "phone" => "required|size:8",
-            "role" => "required|in:abogado,asistente", 
-        ]);
-             User::create([
+      
+      User::create([
                  "name"=> $request->name,
                 "birthday"=>$request->birthday,
                 "email"=>$request->email,
@@ -63,20 +57,24 @@ public function seeBans()
 
 public function editUser(Request $request,$userId)
 {
-        $request->validate([
-            "name" => "required|string|min:5",
-            "birthday" => "required|date|before:today",
-            "email" => "required|unique:users,email",
-            "phone" => "required|size:8",
-            "role" => "required|in:abogado,asistente", 
-        ]);
-        User::where("id", $userId)->update([
-          "name"=> $request->name,
-                "birthday"=>$request->birthday,
-                "email"=>$request->email,
-                "phone"=>$request->phone,
-                "role"=>$request->role,
-        ]);
+    $validated = $request->validate([
+   "name"     => "string|filled",
+   "birthday" => "date|before:today",
+   "email"    => "email",
+   "phone"    => "size:8",
+   "role"     => "in:asistente,abogado"
+]);
+
+if (array_key_exists('email', $validated)) {
+$emailTaken = User::where("email", $validated['email'])->first();
+  if ($emailTaken)
+  {
+    return response()->json("Este correo ya esta asignado a otro usuario");
+  }
+
+}
+User::where('id', $userId)->update($validated);
+
 return response()->json("Usuario actualizado con exito!"); 
   
 }

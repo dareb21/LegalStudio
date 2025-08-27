@@ -187,8 +187,8 @@ if (is_null($folder->folderPath))
     {
         $folderPath = $folder->folderPath;
     }
-$file->storeAs($folderPath,$fileName,"estudioLegal");
-//$file->storeAs($folderPath,$fileName,"private");
+//$file->storeAs($folderPath,$fileName,"estudioLegal");
+$file->storeAs($folderPath,$fileName,"private");
       Document::create([ 
           "documentName"   => $fileName,  
           "folder_id"      =>$folder->id,

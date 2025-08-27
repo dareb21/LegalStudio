@@ -15,8 +15,7 @@ class jobDeleteDocs implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function handle()
-    {    Log::info('Entró al handle del Job');
-        Document::withTrashed()
+    {   Document::withTrashed()
             ->whereNotNull("hardDelete")
             ->select("folderPath","documentName")
             ->chunk(200, function ($documents) {

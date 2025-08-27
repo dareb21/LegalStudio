@@ -9,6 +9,7 @@ use App\Models\Folder;
 use App\Models\Logger;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class LaywerController extends Controller
 {
@@ -127,15 +128,30 @@ Logger::create([
 ]); return response()->json("Carpeta restaurada");
     }
 
-    public function finishThisCase(Folder $thisDir)
+    public function finishThisCase(Folder $thisDir, Request $request)
     {
-        $thisDir->update([
-            "type"=>"finished"
-        ]);
-      Logger::create([
-    "who" => 1,
-    "details" => "Cerro el caso ". $thisDir->folderName  .  " a las " . $this->now,
-]);  
+        $rejected = $request->no;
+        $updated= [];
+        $updated["deleted_at"] =  $this->now;
+        $updated["deleted_by"] =  1;
+        DB::beginTransaction();
+        try
+        {
+            $thisDir->update([
+                "type"=>"finished"
+            ]);
+             Document::whereIn("id",$rejected)->update($updated);
+                   Logger::create([
+                 "who" => 1,
+                 "details" => "Cerro el caso ". $thisDir->folderName  .  " a las " . $this->now,
+                ]);  
+
+  DB::commit(); 
+        } catch (Exception $e) {
+        DB::rollBack();
+
+        return response()->json(['error' => 'Error al guardar el documento', 'detalle' => $e->getMessage()], 500);
+    }
     return response()->json("Su caso paso a cerrado");
     }
 

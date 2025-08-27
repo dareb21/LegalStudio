@@ -57,7 +57,7 @@ class LaywerController extends Controller
     public function deleteDoc($thisDoc)
     {
         $doc= Document::findOrFail($thisDoc);
-        //$doc->deleted_by = 1; //Auth::user()->name;
+        $doc->deleted_by = 1; //Auth::user()->name;
         $docName = $doc->documentName; 
         $doc->save(); 
         $doc->delete();

@@ -107,8 +107,8 @@ public function showDocs($thisDir)
      ]);
      if ($isRoot)
      {
-         //Storage::disk('estudioLegal')->makeDirectory($newFolder->id);
-        Storage::disk('private')->makeDirectory($newFolder->id);
+        Storage::disk('estudioLegal')->makeDirectory($newFolder->id);
+        //Storage::disk('private')->makeDirectory($newFolder->id);
          
      }else
      {
@@ -135,7 +135,7 @@ $fullPath = $path. $newFolder->id;
 $newFolder->folderPath=$fullPath;
 $newFolder->save();
 Storage::disk('estudioLegal')->makeDirectory($fullPath);
-// Storage::disk('private')->makeDirectory($fullPath);
+//Storage::disk('private')->makeDirectory($fullPath);
 }
 switch ($type) {
     case 'active':

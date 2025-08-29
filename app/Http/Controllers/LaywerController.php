@@ -144,9 +144,17 @@ Logger::create([
 
     DB::beginTransaction();
     try {
-        $oldPath = $thisDir->folderPath;
-        $newPath = (string) $thisDir->id; 
+      
+if ($thisDir->folderPath == null)
+{
+        $thisDir->update([
+            "type" => "finished",
+        ]);
 
+}else{
+
+      $oldPath = $thisDir->folderPath;
+        $newPath = (string) $thisDir->id; 
         $disk = Storage::disk('private');
         $disk->makeDirectory(dirname($newPath));
         rename(
@@ -191,7 +199,7 @@ Logger::create([
                 WHERE folder_id IN ($idsStr)
             ");
         }
-
+}
         Document::whereIn("id",$toDelete)->update($toDeleteInfo);
 
        Logger::create([

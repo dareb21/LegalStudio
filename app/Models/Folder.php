@@ -14,6 +14,7 @@ class Folder extends Model
       "type",
       "important",
       "hardDelete",
+      "deleted_at",
       "deleted_by"
     ];
     

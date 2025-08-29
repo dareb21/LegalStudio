@@ -140,6 +140,7 @@ Logger::create([
 
     $toDeleteInfo["deleted_at"] = $this->now;
     $toDeleteInfo["deleted_by"] = 1;
+    
 
     DB::beginTransaction();
     try {
@@ -153,12 +154,15 @@ Logger::create([
             $disk->path($newPath)   
         );
 
+        $folders = Folder::select("folderPath","id")->where('folderPath', 'like', '%/'.$thisDir->id.'%')->get();
+
         $thisDir->update([
             "type" => "finished",
-            "folderPath" => null
+            "folderPath" => null,
+            "parentFolder"=>null,
+            "deleted_at"=>$this->now,
+            "deleted_by"=>1
         ]);
-
-        $folders = Folder::select("folderPath","id")->where('folderPath', 'like', '%/'.$thisDir->id.'%')->get();
 
         $ids = [];
         $cases = "";

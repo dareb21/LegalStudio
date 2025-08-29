@@ -10,6 +10,7 @@ use App\Models\Logger;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class LaywerController extends Controller
 {
@@ -129,31 +130,81 @@ Logger::create([
     }
 
     public function finishThisCase(Folder $thisDir, Request $request)
-    {
-        $rejected = $request->no;
-        $updated= [];
-        $updated["deleted_at"] =  $this->now;
-        $updated["deleted_by"] =  1;
-        DB::beginTransaction();
-        try
-        {
-            $thisDir->update([
-                "type"=>"finished"
-            ]);
-             Document::whereIn("id",$rejected)->update($updated);
-                   Logger::create([
-                 "who" => 1,
-                 "details" => "Cerro el caso ". $thisDir->folderName  .  " a las " . $this->now,
-                ]);  
+{
+    $data = [];
+    $toDeleteInfo = [];
+    $toSave = [];
 
-  DB::commit(); 
-        } catch (Exception $e) {
+    $toDelete = $request->toDelete;
+    $toSave = $request->toSave;
+
+    $toDeleteInfo["deleted_at"] = $this->now;
+    $toDeleteInfo["deleted_by"] = 1;
+
+    DB::beginTransaction();
+    try {
+        $oldPath = $thisDir->folderPath;
+        $newPath = (string) $thisDir->id; 
+
+        $disk = Storage::disk('private');
+        $disk->makeDirectory(dirname($newPath));
+        rename(
+            $disk->path($oldPath),  
+            $disk->path($newPath)   
+        );
+
+        $thisDir->update([
+            "type" => "finished",
+            "folderPath" => null
+        ]);
+
+        $folders = Folder::select("folderPath","id")->where('folderPath', 'like', '%/'.$thisDir->id.'%')->get();
+
+        $ids = [];
+        $cases = "";
+        foreach ($folders as $folder) {
+            $newPath = substr($folder->folderPath, strpos($folder->folderPath, "/".$thisDir->id));        
+
+            $cases .= " WHEN {$folder->id} THEN '{$newPath}'";
+            $ids[] = $folder->id;
+        }
+
+        if (!empty($ids)) {
+            $idsStr = implode(",", $ids);
+
+            DB::update("
+                UPDATE folders 
+                SET folderPath = CASE id 
+                    $cases 
+                END
+                WHERE id IN ($idsStr)
+            ");
+
+            DB::update("
+                UPDATE documents 
+                SET folderPath = CASE folder_id 
+                    $cases 
+                END
+                WHERE folder_id IN ($idsStr)
+            ");
+        }
+
+        Document::whereIn("id",$toDelete)->update($toDeleteInfo);
+
+       Logger::create([
+            "who" => 1,
+            "details" => "Cerro el caso ". $thisDir->folderName  .  " a las " . $this->now,
+        ]);  
+
+        DB::commit(); 
+    } catch (Exception $e) {
         DB::rollBack();
-
         return response()->json(['error' => 'Error al guardar el documento', 'detalle' => $e->getMessage()], 500);
     }
+
     return response()->json("Su caso paso a cerrado");
-    }
+}
+
 
 public function logs()
 {

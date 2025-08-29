@@ -160,8 +160,6 @@ Logger::create([
             "type" => "finished",
             "folderPath" => null,
             "parentFolder"=>null,
-            "deleted_at"=>$this->now,
-            "deleted_by"=>1
         ]);
 
         $ids = [];
@@ -175,14 +173,15 @@ Logger::create([
 
         if (!empty($ids)) {
             $idsStr = implode(",", $ids);
-
             DB::update("
-                UPDATE folders 
-                SET folderPath = CASE id 
+                    UPDATE folders 
+                    SET folderPath = CASE id 
                     $cases 
-                END
-                WHERE id IN ($idsStr)
-            ");
+                    END
+                    WHERE id IN ($idsStr)
+                    AND id != {$thisDir->id}
+                ");
+
 
             DB::update("
                 UPDATE documents 

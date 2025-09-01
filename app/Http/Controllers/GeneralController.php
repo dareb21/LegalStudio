@@ -165,7 +165,7 @@ public function uploadDoc(Request $request,$thisDir)
          "important"=>"required|integer|in:1,2,3",
          "description"=>"required|string|filled",
         "judge" => "nullable|string",
-       "isSensitive" => "nullable|boolean",
+       "isSensitive" => "required|boolean",
          'file' => 'required|file|max:1992294',  
       ]);  
   DB::beginTransaction();
@@ -234,7 +234,6 @@ public function downloadDoc($thisDoc)
 {
  $docInfo=Document::where("id",$thisDoc)->select("isSensitive","documentName","folderPath")->first();
  $path =ltrim($docInfo->folderPath . "/" . $docInfo->documentName);
-   
 //Hacer endpoint para descargar documentos PARA ABOGADOS 
 /*if (Laywer::where("user_id",Auth::user()->id )->exists())
    {
@@ -249,11 +248,11 @@ public function downloadDoc($thisDoc)
     "details" => "Carlos descargo el documento " . $docInfo->documentName . " a las " . $this->now,
 ]);
     
-    return Storage::disk("estudioLegal")->download($path);    
+    return Storage::disk("estudioLegal")->download($path);
+    //return Storage::disk("private")->download($path);        
     }
 
 $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by",1)->orderBy('created_at', 'desc')->first();
-
     if (!$petition)
     {
         Logger::create([
@@ -279,7 +278,8 @@ $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by"
     "details" => "Carlos descargo el documento " . $docInfo->documentName . " a las " . $this->now,
 ]);
 
-    return Storage::disk("estudioLegal")->download($path);         
+    return Storage::disk("estudioLegal")->download($path);
+    //return Storage::disk("private")->download($path);
     }else
     {    Logger::create([
     "who" => 1,

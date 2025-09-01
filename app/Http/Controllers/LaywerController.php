@@ -56,13 +56,12 @@ class LaywerController extends Controller
     ]);
     }
 
-    public function deleteDoc($thisDoc)
-    {
-        $doc= Document::findOrFail($thisDoc);
-        $doc->deleted_by = 1; //Auth::user()->name;
-        $docName = $doc->documentName; 
-        $doc->save(); 
-        $doc->delete();
+    public function deleteDoc(Document $thisDoc)
+    {;
+        $thisDoc->deleted_by = 1; //Auth::user()->name;
+        $docName = $thisDoc->documentName; 
+        $thisDoc->save(); 
+       
    Logger::create([
     "who" => 1,
     "details" => "Carlos Palma elimino el documento ". $docName  .  " a las " . $this->now,
@@ -71,14 +70,13 @@ class LaywerController extends Controller
         return response()->json("El archivo se mando a la bandeja de reciclaje");
     }
 
-    public function deleteDir($thisDir)
+    public function deleteDir(Folder $thisDir)
     {
-        $dir =Folder::findOrFail($thisDir);
-        //$dir->deleted_by = 1; //Auth::user()->name;
-        $dirName = $dir->folderName;
-        $dir->deleted_at=$this->now;
-        $dir->deleted_by =1;
-        $doc->save();
+        $thisDir->deleted_by = 1; //Auth::user()->name;
+        $dirName = $thisDir->folderName;
+        $thisDir->deleted_at=$this->now;
+        $thisDir->deleted_by =1;
+        $thisDir->save();
 Logger::create([
     "who" => 1,
     "details" => "Carlos Palma elimino la carpeta ". $dirName  .  " a las " . $this->now,
@@ -89,9 +87,12 @@ Logger::create([
 
     public function recycleCan($dirType)
         {
+        if (!in_array($dirType,['active', 'finished', 'jurisprudence'])){
+            return response()->json("Tipo de carpeta no valida");
+        }    
           $documents =Document::onlyTrashed()
           ->join("folders","documents.folder_id","=","folders.id")
-          ->whereNull("folders.hardDelete")
+          ->whereNull("documents.hardDelete")
           ->where("folders.type",$dirType)
           ->select("documents.id as docId","documents.documentName as docName","documents.description as docDesc","documents.whoMadeIt as whoUpload","documents.isSensitive","documents.deleted_at as deletedAt","documents.important","documents.judge")
           ->paginate(10);  
@@ -122,8 +123,9 @@ Logger::create([
         $folder=Folder::withTrashed()->find($thisDir);
         $folderName = $folder->folderName;
         $folder->deleted_by = null;
+        $folder->deleted_by = 1;
         $folder->save();
-        $folder->restore();  
+     
    Logger::create([
     "who" => 1,
     "details" => "Carlos restauro la carpeta ". $folderName  .  " a las " . $this->now,
@@ -219,8 +221,11 @@ if ($thisDir->folderPath == null)
 
 public function logs()
 {
-    $logs = Logger::paginate(30);
-    return response()->json([
+ $fifteenDays = \Carbon\Carbon::parse($this->now)->subDays(15);
+    $logs = Logger::where('created_at', '>=', $dateLimit)
+                  ->orderBy('created_at', 'desc')
+                  ->paginate(30);    
+   return response()->json([
         "logs" => $logs
     ]);
 }

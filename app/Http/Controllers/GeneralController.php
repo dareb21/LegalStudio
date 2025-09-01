@@ -187,8 +187,8 @@ if (is_null($folder->folderPath))
     {
         $folderPath = $folder->folderPath;
     }
-//$file->storeAs($folderPath,$fileName,"estudioLegal");
-$file->storeAs($folderPath,$fileName,"private");
+$file->storeAs($folderPath,$fileName,"estudioLegal");
+//$file->storeAs($folderPath,$fileName,"private");
       Document::create([ 
           "documentName"   => $fileName,  
           "folder_id"      =>$folder->id,
@@ -279,6 +279,8 @@ $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by"
 ]);
 
     return Storage::disk("estudioLegal")->download($path);
+    $petition->status = 0;
+    $petition->save();
     //return Storage::disk("private")->download($path);
     }else
     {    Logger::create([

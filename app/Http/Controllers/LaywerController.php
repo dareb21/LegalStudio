@@ -76,8 +76,9 @@ class LaywerController extends Controller
         $dir =Folder::findOrFail($thisDir);
         //$dir->deleted_by = 1; //Auth::user()->name;
         $dirName = $dir->folderName;
-        $dir->save();
-        $dir->delete();
+        $dir->deleted_at=$this->now;
+        $dir->deleted_by =1;
+        $doc->save();
 Logger::create([
     "who" => 1,
     "details" => "Carlos Palma elimino la carpeta ". $dirName  .  " a las " . $this->now,
@@ -102,13 +103,13 @@ Logger::create([
         ]);
     }
 
-    public function restoreDoc($thisDoc)
+    public function restoreDoc($thisDoc) //Proba poniendo aca el modelo document
     {
         $doc = Document::withTrashed()->find($thisDoc);
         $docName = $doc->documentName;
         $doc->deleted_by = null;
+        $doc->deleted_at=null;
         $doc->save();
-        $doc->restore();
 Logger::create([
     "who" => 1,
     "details" => "Carlos restauro el documento ". $docName  .  " a las " . $this->now,
@@ -136,7 +137,7 @@ Logger::create([
     $toSave = [];
 
     $toDelete = $request->toDelete;
-    $toSave = $request->toSave;
+    $toSave = $request->toSave; //Creo que esto se puede ir
 
     $toDeleteInfo["deleted_at"] = $this->now;
     $toDeleteInfo["deleted_by"] = 1;
@@ -155,7 +156,7 @@ if ($thisDir->folderPath == null)
 
       $oldPath = $thisDir->folderPath;
         $newPath = (string) $thisDir->id; 
-        $disk = Storage::disk('private');
+        $disk = Storage::disk('estudioLegal');
         $disk->makeDirectory(dirname($newPath));
         rename(
             $disk->path($oldPath),  
@@ -189,7 +190,6 @@ if ($thisDir->folderPath == null)
                     WHERE id IN ($idsStr)
                     AND id != {$thisDir->id}
                 ");
-
 
             DB::update("
                 UPDATE documents 

@@ -122,8 +122,8 @@ Logger::create([
     {
         $folder=Folder::withTrashed()->find($thisDir);
         $folderName = $folder->folderName;
+        $folder->deleted_at = null;
         $folder->deleted_by = null;
-        $folder->deleted_by = 1;
         $folder->save();
      
    Logger::create([

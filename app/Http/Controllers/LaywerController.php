@@ -92,11 +92,17 @@ Logger::create([
         }    
           $documents =Document::onlyTrashed()
           ->join("folders","documents.folder_id","=","folders.id")
+          ->join("users","documents.deleted_by","=","users.id")
           ->whereNull("documents.hardDelete")
           ->where("folders.type",$dirType)
-          ->select("documents.id as docId","documents.documentName as docName","documents.description as docDesc","documents.whoMadeIt as whoUpload","documents.isSensitive","documents.deleted_at as deletedAt","documents.important","documents.judge")
-          ->paginate(10);  
-        $folder =Folder::onlyTrashed()->where("type",$dirType)->where("hardDelete",null)->paginate(10);
+          ->select("documents.id as docId","documents.documentName as docName","documents.description as docDesc","documents.whoMadeIt as whoUpload","documents.isSensitive","documents.deleted_at as deletedAt","documents.important","documents.judge","users.name as deletedBy")
+          ->paginate(10);
+            
+        $folder =Folder::onlyTrashed()
+        ->join("users","folders.deleted_by","=","users.id")
+        ->where("type",$dirType)
+        ->where("hardDelete",null)
+        ->paginate(10);
 
     return response()->json([
             "documents"=>$documents,

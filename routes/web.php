@@ -25,7 +25,10 @@ Route::get('/', function () {
         Route::patch('/unBanThisUser/{userId}', [AdminController::class, 'unBanThisUser']);
         Route::put('/editUser/{userId}', [AdminController::class, 'editUser']);
        Route::get('/seeBans', [AdminController::class, 'seeBans']);
-         //ver todos los logs
+       Route::get("/allLogs",[AdminController::class, 'allLogs']);
+       Route::get("/userLogs/{userId}",[AdminController::class, 'specificLog']); 
+       
+       //ver todos los logs
         //Editar
        
         Route::get('/seeRequest', [LaywerController::class, 'seeRequest']);   
@@ -36,7 +39,7 @@ Route::get('/', function () {
         Route::patch('/restore/{thisDoc}', [LaywerController::class, 'restoreDoc']);
         Route::patch('/restoreDir/{thisDir}', [LaywerController::class, 'restoreDir']);
         Route::patch('/finished/{thisDir}', [LaywerController::class, 'finishThisCase']);
-        Route::get('/logs', [LaywerController::class, 'logs']);    
+        Route::get('/logs', [LaywerController::class, 'quickLogs']);    
         Route::put('/updateDir/{thisDir}', [LaywerController::class, 'updateDir']);  
         Route::put('/updateDoc/{thisDoc}', [LaywerController::class, 'updateDoc']);  
       

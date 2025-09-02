@@ -224,10 +224,11 @@ if ($thisDir->folderPath == null)
 }
 
 
-public function logs()
+public function quickLogs()
 {
  $fifteenDays = \Carbon\Carbon::parse($this->now)->subDays(15);
     $logs = Logger::where('created_at', '>=', $fifteenDays)
+                   ->select("details") 
                   ->orderBy('created_at', 'desc')
                   ->paginate(30);    
    return response()->json([

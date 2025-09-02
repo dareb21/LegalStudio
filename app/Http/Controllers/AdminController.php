@@ -5,6 +5,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Models\Logger;
 
 class AdminController extends Controller
 {
@@ -79,9 +80,62 @@ return response()->json("Usuario actualizado con exito!");
   
 }
 
-public function viewLogs()
+public function allLogs(Request $request)
 {
+    $request->validate([
+    "dateStart" => "nullable|date|before_or_equal:today",
+    "dateEnd"   => "nullable|date|after_or_equal:dateStart",
+]);
 
+    $dateStart = $request->dateStart;
+    $dateEnd   = $request->dateEnd;
+
+    $users = User::select("id","name")->get();
+    $logs = Logger::select("details")
+            ->when($dateStart && $dateEnd, function ($query) use ($dateStart, $dateEnd) {
+            $query->whereBetween("created_at", [$dateStart, $dateEnd]);
+        })
+        ->paginate(30);
+$details= [];
+        foreach ($logs as $log)
+        {
+            $details[] = $log->details;
+        }
+
+    return response()->json([
+        "users"=>$users,
+        "details"=>$details,
+    ]);
 }
+
+public function specificLog($userId,Request $request)
+{
+    $request->validate([
+    "dateStart" => "nullable|date|before_or_equal:today",
+    "dateEnd"   => "nullable|date|after_or_equal:dateStart",
+]);
+
+    $dateStart = $request->dateStart;
+    $dateEnd   = $request->dateEnd;
+
+    $userInfo = Logger::select("details")
+        ->where("who", $userId)
+        ->when($dateStart && $dateEnd, function ($query) use ($dateStart, $dateEnd) {
+            $query->whereBetween("created_at", [$dateStart, $dateEnd]);
+        })
+        ->paginate(30);
+
+$details= [];
+        foreach ($userInfo as $log)
+        {
+            $details[] = $log->details;
+        }
+
+
+    return response()->json([
+        "details" => $details,
+    ]);
+}
+
 
 }

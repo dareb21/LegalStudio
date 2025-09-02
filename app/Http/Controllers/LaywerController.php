@@ -99,7 +99,6 @@ Logger::create([
           ->paginate(10);
 
         $folder =Folder::onlyTrashed()
-        ->join("users","folders.deleted_by","=","users.id")
         ->where("type",$dirType)
         ->where("hardDelete",null)
         ->paginate(10);

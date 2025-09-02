@@ -273,14 +273,16 @@ $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by"
     }
 
     if ( $petition->status==1)
-    {Logger::create([
+    {
+        Logger::create([
     "who" => 1,
     "details" => "Carlos descargo el documento " . $docInfo->documentName . " a las " . $this->now,
-]);
+]); 
+$petition->status = 0;
+    $petition->save();
 
     return Storage::disk("estudioLegal")->download($path);
-    $petition->status = 0;
-    $petition->save();
+   
     //return Storage::disk("private")->download($path);
     }else
     {    Logger::create([

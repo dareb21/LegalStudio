@@ -59,6 +59,7 @@ class LaywerController extends Controller
     public function deleteDoc(Document $thisDoc)
     {;
         $thisDoc->deleted_by = 1; //Auth::user()->name;
+        $thisDoc->deleted_at=$this->now;
         $docName = $thisDoc->documentName; 
         $thisDoc->save(); 
        
@@ -75,7 +76,6 @@ class LaywerController extends Controller
         $thisDir->deleted_by = 1; //Auth::user()->name;
         $dirName = $thisDir->folderName;
         $thisDir->deleted_at=$this->now;
-        $thisDir->deleted_by =1;
         $thisDir->save();
 Logger::create([
     "who" => 1,
@@ -97,7 +97,7 @@ Logger::create([
           ->where("folders.type",$dirType)
           ->select("documents.id as docId","documents.documentName as docName","documents.description as docDesc","documents.whoMadeIt as whoUpload","documents.isSensitive","documents.deleted_at as deletedAt","documents.important","documents.judge","users.name as deletedBy")
           ->paginate(10);
-            
+
         $folder =Folder::onlyTrashed()
         ->join("users","folders.deleted_by","=","users.id")
         ->where("type",$dirType)

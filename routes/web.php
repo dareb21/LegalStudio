@@ -42,4 +42,5 @@ Route::get('/', function () {
         Route::get('/logs', [LaywerController::class, 'quickLogs']);    
         Route::put('/updateDir/{thisDir}', [LaywerController::class, 'updateDir']);  
         Route::put('/updateDoc/{thisDoc}', [LaywerController::class, 'updateDoc']);  
+        Route::get('/docActivity/{thisDoc}', [LaywerController::class, 'docActivity']);    
       

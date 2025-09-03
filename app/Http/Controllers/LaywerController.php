@@ -40,7 +40,7 @@ class LaywerController extends Controller
            "reply"=>"required|boolean"
         ]);
       
-        $thisRequest->update([
+        $thisRequest->update([    // Esto se puede hacer en una sola consulta
             "status"=>$request->reply,
             "responded_by"=>2, 
             "responseDate"=>$this->now
@@ -58,13 +58,14 @@ class LaywerController extends Controller
 
     public function deleteDoc(Document $thisDoc)
     {;
-        $thisDoc->deleted_by = 1; //Auth::user()->name;
+        $thisDoc->deleted_by = 1; //Auth::user()->name; esto con un update se puede hacer
         $thisDoc->deleted_at=$this->now;
         $docName = $thisDoc->documentName; 
         $thisDoc->save(); 
        
    Logger::create([
     "who" => 1,
+    "doc"=>$thisDoc,
     "details" => "Carlos Palma elimino el documento ". $docName  .  " a las " . $this->now,
 ]);
    
@@ -109,15 +110,16 @@ Logger::create([
         ]);
     }
 
-    public function restoreDoc($thisDoc) //Proba poniendo aca el modelo document
+    public function restoreDoc($thisDoc) 
     {
-        $doc = Document::withTrashed()->find($thisDoc);
+        $doc = Document::withTrashed()->find($thisDoc); //esto es otro update solo que con trashed
         $docName = $doc->documentName;
         $doc->deleted_by = null;
         $doc->deleted_at=null;
         $doc->save();
 Logger::create([
     "who" => 1,
+    "doc"=>$thisDoc,
     "details" => "Carlos restauro el documento ". $docName  .  " a las " . $this->now,
 ]);
     return response()->json("Archivo restaurado");
@@ -256,9 +258,35 @@ public function updateDoc($thisDoc, Request $request)
         "important"=>"integer|in:1,2,3",
         "judge"=>"string|filled",
     ]);
+    $array=[
+        "documentName" =>"Nombre documento",
+        "isSensitive"=>"Sensibilidad de documento",
+        "description"=>"Descripcion de documento",
+        "important"=>"Importancia de caso",
+        "judge"=>"Nombre de Juez"
+    ];
+$changes = array_values(array_intersect_key($array, $validated));
+$string=" ";
+
+foreach ($changes as $change)
+{
+    $string.=",".$change;
+}
+$doc= Document::where("id",$thisDoc)->select("documentName")->first();
 Document::where('id', $thisDoc)->update($validated);
-  return response()->noContent();
+Logger::create([
+    "who" => 1,
+    "doc"=>$thisDoc,
+    "details" => "Carlos modifico los campos ". $string  ." del documento ".$doc->documentName ." a las " . $this->now,
+]);
+return response()->noContent();
 }
 
-
+public function docActivity($thisDoc)
+{
+$logs = Logger::select("details")->where("doc",$thisDoc)->paginate(50);
+return response([
+    "logs"=>$logs
+]);
+}
 }

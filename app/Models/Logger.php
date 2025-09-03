@@ -8,6 +8,7 @@ class Logger extends Model
 {
     protected $fillable = [
         'who',
+        "doc",
         'details',
     ];
 }

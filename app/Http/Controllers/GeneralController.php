@@ -139,10 +139,10 @@ Storage::disk('estudioLegal')->makeDirectory($fullPath);
 }
 switch ($type) {
     case 'active':
-        $logType = 'casos activos';
+        $logType = 'Casos activos';
         break;
     case 'finished':
-        $logType = 'casos finalizados';
+        $logType = 'Casos finalizados';
         break;
     case 'jurisprudence':
         $logType = 'Jurisprudencia';
@@ -152,7 +152,7 @@ switch ($type) {
 }
 Logger::create([
     "who" => 1,
-    "details" => "Juan Garcia creo una carpeta llamada " . $folderName . " del tipo " . $logType . " a las " . $this->now,
+    "details" => "Juan Garcia creo una carpeta llamada: " . $folderName . ", del tipo: " . $logType . " el dia " . $this->now,
 ]);
  return response()->json("Carpeta Creada con exito");
     }
@@ -189,7 +189,7 @@ if (is_null($folder->folderPath))
     }
 $file->storeAs($folderPath,$fileName,"estudioLegal");
 //$file->storeAs($folderPath,$fileName,"private");
-      Document::create([ 
+     $doc= Document::create([ 
           "documentName"   => $fileName,  
           "folder_id"      =>$folder->id,
           "folderPath" =>   $folderPath,
@@ -199,8 +199,6 @@ $file->storeAs($folderPath,$fileName,"estudioLegal");
           "isSensitive"    => $request->isSensitive,
           "important" => $request->important
         ]);
-        DB::commit();
-
 
 switch ($folder->type) {
     case 'active':
@@ -219,8 +217,10 @@ switch ($folder->type) {
 
 Logger::create([
     "who" => 1,
-    "details" => "Carlos subio el documento " . $fileName . " a las " . $this->now." en el area " . $logType,
+    "doc"=> $doc->id,
+    "details" => "Carlos subio el documento: " . $fileName . " el dia " . $this->now." en el area: " . $logType,
 ]);
+        DB::commit();
     
              return response()->json(['message' => 'Documento subido correctamente']);
     } catch (Exception $e) {
@@ -233,6 +233,10 @@ Logger::create([
 public function downloadDoc($thisDoc)
 {
  $docInfo=Document::where("id",$thisDoc)->select("isSensitive","documentName","folderPath")->first();
+ if (!$docInfo)
+ {
+    return response()->json("No se encontro este archivo.");
+ }
  $path =ltrim($docInfo->folderPath . "/" . $docInfo->documentName);
 //Hacer endpoint para descargar documentos PARA ABOGADOS 
 /*if (Laywer::where("user_id",Auth::user()->id )->exists())
@@ -242,10 +246,10 @@ public function downloadDoc($thisDoc)
 */
     if ($docInfo->isSensitive == 0)
     {   
-
     Logger::create([
     "who" => 1,
-    "details" => "Carlos descargo el documento " . $docInfo->documentName . " a las " . $this->now,
+    "doc"=>$thisDoc,
+    "details" => "Carlos descargo el documento: " . $docInfo->documentName . " el dia " . $this->now,
 ]);
     
     return Storage::disk("estudioLegal")->download($path);
@@ -257,7 +261,8 @@ $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by"
     {
         Logger::create([
     "who" => 1,
-    "details" => "Carlos intento descargar el documento " . $docInfo->documentName . " a las " . $this->now,
+    "doc"=>$thisDoc,
+    "details" => "Carlos intento descargar el documento: " . $docInfo->documentName . " el dia " . $this->now,
 ]);
 
         return response()->json([
@@ -276,7 +281,8 @@ $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by"
     {
         Logger::create([
     "who" => 1,
-    "details" => "Carlos descargo el documento " . $docInfo->documentName . " a las " . $this->now,
+    "doc"=>$thisDoc,
+    "details" => "Carlos descargo el documento: " . $docInfo->documentName . " el dia " . $this->now,
 ]); 
 $petition->status = 0;
     $petition->save();
@@ -287,7 +293,8 @@ $petition->status = 0;
     }else
     {    Logger::create([
     "who" => 1,
-    "details" => "Carlos intento descargar el documento " . $docInfo->documentName . " a las " . $this->now." pero su solicitud fue rechazada",
+    "doc"=>$thisDoc,
+    "details" => "Carlos intento descargar el documento: " . $docInfo->documentName . " el dia " . $this->now." pero su solicitud fue rechazada",
 ]);
   
         return response()->json([
@@ -311,6 +318,7 @@ $petition->status = 0;
     ]);
 Logger::create([
     "who" => 1,
+    "doc"=>$thisDoc,
     "details" => "Carlos solicito la descarga del documento con id " . $thisDoc . " a las " . $this->now." con el numero de solicitud " . $requestNum->id,
 ]);
 

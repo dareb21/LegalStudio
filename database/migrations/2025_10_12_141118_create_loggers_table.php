@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('loggers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('who')->constrained('users');
+            $table->foreignId("doc")->nullable()->constrained("documents");
             $table->text('details');
             $table->timestamps();
         });

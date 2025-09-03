@@ -48,7 +48,7 @@ class LaywerController extends Controller
       $status = $request->reply ? "aprobo":"rechazo";
    Logger::create([
     "who" => 2,
-    "details" => "Pedro Garcia ". $status  . "la solicitud numero" . $thisRequest->id . " a las " . $this->now,
+    "details" => "Pedro Garcia ". $status  . "la solicitud numero" . $thisRequest->id . " el dia " . $this->now,
 ]);
         
     return response()->json([
@@ -66,7 +66,7 @@ class LaywerController extends Controller
    Logger::create([
     "who" => 1,
     "doc"=>$thisDoc,
-    "details" => "Carlos Palma elimino el documento ". $docName  .  " a las " . $this->now,
+    "details" => "Carlos Palma elimino el documento ". $docName  .  " el dia " . $this->now,
 ]);
    
         return response()->json("El archivo se mando a la bandeja de reciclaje");
@@ -80,7 +80,7 @@ class LaywerController extends Controller
         $thisDir->save();
 Logger::create([
     "who" => 1,
-    "details" => "Carlos Palma elimino la carpeta ". $dirName  .  " a las " . $this->now,
+    "details" => "Carlos Palma elimino la carpeta ". $dirName  .  " el dia " . $this->now,
 ]);
          
     return response()->json("La carpeta se mando a la bandeja de reciclaje");
@@ -120,7 +120,7 @@ Logger::create([
 Logger::create([
     "who" => 1,
     "doc"=>$thisDoc,
-    "details" => "Carlos restauro el documento ". $docName  .  " a las " . $this->now,
+    "details" => "Carlos restauro el documento ". $docName  .  " el dia " . $this->now,
 ]);
     return response()->json("Archivo restaurado");
     }
@@ -135,7 +135,7 @@ Logger::create([
      
    Logger::create([
     "who" => 1,
-    "details" => "Carlos restauro la carpeta ". $folderName  .  " a las " . $this->now,
+    "details" => "Carlos restauro la carpeta ". $folderName  .  " el dia " . $this->now,
 ]); return response()->json("Carpeta restaurada");
     }
 
@@ -213,7 +213,7 @@ if ($thisDir->folderPath == null)
 
        Logger::create([
             "who" => 1,
-            "details" => "Cerro el caso ". $thisDir->folderName  .  " a las " . $this->now,
+            "details" => "Cerro el caso ". $thisDir->folderName  .  " el dia " . $this->now,
         ]);  
 
         DB::commit(); 
@@ -277,7 +277,7 @@ Document::where('id', $thisDoc)->update($validated);
 Logger::create([
     "who" => 1,
     "doc"=>$thisDoc,
-    "details" => "Carlos modifico los campos ". $string  ." del documento ".$doc->documentName ." a las " . $this->now,
+    "details" => "Carlos modifico los campos: ". $string  ." del documento: ".$doc->documentName ." el dia " . $this->now,
 ]);
 return response()->noContent();
 }

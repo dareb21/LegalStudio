@@ -9,6 +9,10 @@ use App\Http\Controllers\LaywerController;
 Route::get('/', function () {
     return ['Laravel' => app()->version()];
 });
+
+Route::get("/auth/google",[LoginController::class,"logIn"]);
+Route::get("/auth/google/callback",[LoginController::class,"handdleCallBack"]);
+
     Route::get("/dashboard",[GeneralController::class, 'dashboard']);
 
     Route::get("/dirs/{type}",[GeneralController::class, 'showDirs']);

@@ -319,7 +319,7 @@ $petition->status = 0;
 Logger::create([
     "who" => 1,
     "doc"=>$thisDoc,
-    "details" => "Carlos solicito la descarga del documento con id " . $thisDoc . " a las " . $this->now." con el numero de solicitud " . $requestNum->id,
+    "details" => "Carlos solicito la descarga del documento con id " . $thisDoc . " el dia " . $this->now." con el numero de solicitud " . $requestNum->id,
 ]);
 
 

@@ -23,17 +23,14 @@ try
         $user = User::where("email",$googleUser->getEmail())->first(); 
         if (!$user || $user->banned == 1)
             {   
-                return abort(401,"Correo no Autorizado");
+                return abort(404);
             }
-            $user->createToken("auth_token")->plainTextToken;  
+          $token = $user->createToken("auth_token")->plainTextToken;  
             
-       //Log::info($user->name ." ingreso a la plataforma el dia: " . now()->format('H:i d/m/Y'));
-     
     return response()->json([
-    "status"=>"ok", 
     "email"=>$user->email,
     "name"=>$user->name,
-    "token"=>$token,
+    "authorization" => "Bearer {$token}",
     "typeToken"=>"Bearer",
     "googlePhoto"=>$googleUser->getAvatar(),
     "role"=>$user->role

@@ -32,8 +32,8 @@ $roleCookie = cookie(
     60*24*7,
     '/',
     null,
-    true,      // secure
-    false,     // httpOnly = false, para que JS pueda leerla
+    false,  // secure = false para localhost
+    false,  // httpOnly = false
     false,
     'None'
 );

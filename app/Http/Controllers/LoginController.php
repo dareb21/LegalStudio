@@ -37,7 +37,7 @@ $roleCookie = cookie(
     false,
     'None'
 );
-return redirect()->to('http://localhost:5173')->withCookies([$roleCookie]);
+return redirect()->to('http://localhost:5173/dashboard')->withCookies([$roleCookie]);
 
         /*  $token = $user->createToken("auth_token")->plainTextToken;          
 $cookie = cookie(

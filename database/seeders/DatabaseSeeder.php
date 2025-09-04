@@ -53,9 +53,17 @@ User::create([
 ]);
 
 User::create([
-    "email"=> 'palma.chn15@gmail.com',
-    "name"=>'Carlos Daniel Palma Antunez',
-    "phone"=>"95680555",
+    "email"=> 'Raul.ed.chinchilla@bufete-chinchillapaz.com',
+    "name"=>'Raul Edgardo Chincilla Aguilar',
+    "phone"=>"98908152",
+    "birthday"=>"2002-12-20",
+    "role"=>"Abogado"
+]);
+
+User::create([
+    "email"=> 'lourdespaz@bufete-chinchillapaz.com',
+    "name"=>'Lourdes Delmar Paz Paz',
+    "phone"=>"94662955",
     "birthday"=>"2002-12-20",
     "role"=>"Asistente"
 ]);

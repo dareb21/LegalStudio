@@ -44,7 +44,13 @@ User::create([
     "birthday"=>"09/12/1834",
     "role"=>"Abogado"
 ]);
-
+User::create([
+    "email"=>'3190019@usap.edu',
+    'name'=>'Luis fernando Asistente',
+    'phone'=>'32323232',
+    'birthday'=>'2002-04-12',
+    'role'=>'Asistente'
+]);
 
 User::create([
     "email"=> 'palma.chn15@gmail.com',

@@ -38,10 +38,8 @@ try
             false,     // httpOnly (false para que JS pueda leerla)
             false,
             'None'
-        );
-        
-        return redirect()->to('https://estudiolegalhn.com/dashboard')->withCookies([$cookieRole]);
-
+        );$params = "?success=true"; 
+        return redirect()->to('https://estudiolegalhn.com/'.$params)->withCookies([$cookieRole]);
 
         /*  $token = $user->createToken("auth_token")->plainTextToken;          
 $cookie = cookie(

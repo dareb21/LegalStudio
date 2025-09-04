@@ -36,7 +36,7 @@ try
              '.estudiolegalhn.com',
             true,      // secure
             false,     // httpOnly (false para que JS pueda leerla)
-            true,
+            false,
             'None'
         );
         
@@ -56,14 +56,19 @@ $cookie = cookie(
         'None'                
     );*/
 
-    return redirect()->to('https://app.midominio.com/oauth/success')->withCookie($cookie);
-        }
+   }
     catch(Exception $e)
     {
         return  response()->json(["Error"=>"Ha habido un error al autentificarse con google","Details"=> $e->getMessage() ]);
 
     }
+}
 
-
+public function roleUser(Request $request)
+{
+        $role = $request->cookie("user_role");
+        return response()->json([
+            "userRole"=>$role,
+        ]);
 }
 }

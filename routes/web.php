@@ -12,6 +12,7 @@ Route::get('/', function () {
 
 Route::get("/auth/google",[LoginController::class,"logIn"]);
 Route::get("/auth/google/callback",[LoginController::class,"handdleCallBack"]);
+Route::get("/auth/role",[LoginController::class,'roleUser']);
 
     Route::get("/dashboard",[GeneralController::class, 'dashboard']);
 

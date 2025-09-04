@@ -31,7 +31,7 @@ $roleCookie = cookie(
     $user->role,
     60*24*7,
     '/',
-    '.estudiolegalhn.com',
+    null,
     true,      // secure
     false,     // httpOnly = false, para que JS pueda leerla
     false,

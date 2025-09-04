@@ -12,6 +12,7 @@ class LoginController extends Controller
 {
  public function logIn()
     {
+        
         return Socialite::driver("google")->stateless()->redirect();
     }
 
@@ -25,17 +26,33 @@ try
             {   
                 return abort(404);
             }
-          $token = $user->createToken("auth_token")->plainTextToken;  
-            
-    return response()->json([
-    "email"=>$user->email,
-    "name"=>$user->name,
-    "authorization" => "Bearer {$token}",
-    "typeToken"=>"Bearer",
-    "googlePhoto"=>$googleUser->getAvatar(),
-    "role"=>$user->role
-]);
+$roleCookie = cookie(
+    'user_role',
+    $user->role,
+    60*24*7,
+    '/',
+    '.estudiolegalhn.com',
+    true,      // secure
+    false,     // httpOnly = false, para que JS pueda leerla
+    false,
+    'None'
+);
+return redirect()->to('https://estudiolegalhn.com/')->withCookies([$roleCookie]);
 
+        /*  $token = $user->createToken("auth_token")->plainTextToken;          
+$cookie = cookie(
+        'auth_token',         
+        $token,              
+        60*24*7,           
+        '/',                 
+        '.midominio.com/',    
+        true,                
+        true,                
+        false,                
+        'None'                
+    );*/
+
+    return redirect()->to('https://app.midominio.com/oauth/success')->withCookie($cookie);
         }
     catch(Exception $e)
     {
@@ -44,9 +61,5 @@ try
     }
 
 
-}
-public function hi()
-{
-return response()->json("Hi");
 }
 }

@@ -41,7 +41,7 @@ User::create([
     "email"=> 'fernandossrc@gmail.com',
     "name"=>'Luis Fernando Fuentes Tabora',
     "phone"=>"32310952",
-    "birthday"=>"09/12/1834",
+    "birthday"=>"1834-03-12",
     "role"=>"Abogado"
 ]);
 User::create([
@@ -56,7 +56,7 @@ User::create([
     "email"=> 'palma.chn15@gmail.com',
     "name"=>'Carlos Daniel Palma Antunez',
     "phone"=>"95680555",
-    "birthday"=>"29/05/2002",
+    "birthday"=>"2002-12-20",
     "role"=>"Asistente"
 ]);
 

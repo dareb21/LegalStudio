@@ -29,7 +29,7 @@ try
 
 
         $cookieRole = cookie(
-            "userRole",
+            "user_role",
             $user->role,
             60*24*7,
             '/',

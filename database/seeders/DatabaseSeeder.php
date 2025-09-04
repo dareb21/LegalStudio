@@ -72,7 +72,7 @@ User::create([
 User::create([
     "email"=> 'palma.chn15@gmail.com',
     "name"=>'Carlos Palma',
-    "phone"=>"94662955",
+    "phone"=>"21212121",
     "birthday"=>"2002-12-20",
     "role"=>"Admin"
 ]);
@@ -81,7 +81,7 @@ User::create([
 User::create([
     "email"=> 'practicas25.luisfuentes@usap.edu',
     "name"=>'Luis el fucker',
-    "phone"=>"94662955",
+    "phone"=>"90909090",
     "birthday"=>"2002-12-20",
     "role"=>"Admin"
 ]);

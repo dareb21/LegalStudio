@@ -37,7 +37,7 @@ $roleCookie = cookie(
     false,
     'None'
 );
-return redirect()->to('https://estudiolegalhn.com/')->withCookies([$roleCookie]);
+return redirect()->to('http://localhost:5173')->withCookies([$roleCookie]);
 
         /*  $token = $user->createToken("auth_token")->plainTextToken;          
 $cookie = cookie(

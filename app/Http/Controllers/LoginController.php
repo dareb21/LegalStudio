@@ -40,7 +40,7 @@ try
             'None'
         );
         
-        return redirect()->to('https://estudiolegalhn.com/dashboard')->withCookies($cookieRole);
+        return redirect()->to('https://estudiolegalhn.com/dashboard')->withCookies([$cookieRole]);
 
 
         /*  $token = $user->createToken("auth_token")->plainTextToken;          

@@ -26,18 +26,22 @@ try
             {   
                 return abort(404);
             }
-$roleCookie = cookie(
-    'user_role',
-    $user->role,
-    60*24*7,
-    '/',
-    null,
-    false,  // secure = false para localhost
-    false,  // httpOnly = false
-    false,
-    'None'
-);
-return redirect()->to('http://localhost:5173/dashboard')->withCookies([$roleCookie]);
+
+
+        $cookieRole = cookie(
+            "userRole",
+            $user->role,
+            60*24*7,
+            '/',
+             '.estudiolegalhn.com',
+            true,      // secure
+            false,     // httpOnly (false para que JS pueda leerla)
+            true,
+            'None'
+        );
+        
+        return redirect()->to('https://estudiolegalhn.com/dashboard')->withCookies($roleCookie);
+
 
         /*  $token = $user->createToken("auth_token")->plainTextToken;          
 $cookie = cookie(

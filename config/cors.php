@@ -15,11 +15,11 @@ return [
     |
     */
 
-    'paths' => ['*'],
+    'paths' => ['api/*'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['https://estudiolegalhn.com','https://api.estudiolegalhn.com'],
 
     'allowed_origins_patterns' => [],
 

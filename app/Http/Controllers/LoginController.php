@@ -22,16 +22,22 @@ try
     {
         $googleUser = Socialite::driver('google')->stateless()->user();
         $user = User::where("email",$googleUser->getEmail())->first(); 
+        
         if (!$user || $user->banned == 1)
             {   
                 return abort(404);
             }
-
-
+$userInfo=[];
+$userInfo = [
+    "role" => $user->role,
+    "name" => $googleUser->getName(),
+    "photo" => $googleUser->getAvatar(),
+    "email" => $googleUser->getEmail()
+];
         $cookieRole = cookie(
             "user_role",
-            $user->role,
-            60*24*7,
+             json_encode($userInfo),
+            20,
             '/',
              '.estudiolegalhn.com',
             true,      // secure

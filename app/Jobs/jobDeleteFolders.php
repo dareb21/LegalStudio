@@ -18,19 +18,15 @@ class jobDeleteFolders implements ShouldQueue
 
     public function handle()
     {
-        Folder::withTrashed()
+        Folder::onlyTrashed()
             ->whereNotNull("hardDelete")
             ->select("folderPath","id")
             ->chunk(200, function ($folders) {
                 foreach ($folders as $dir) {
-                    if(is_null($dir->folderPath))
-                    {
-                        $path= "/".$dir->id;
-                    }else{
-                        $path=$dir->folderPath;
-                    }
-                    Log::info("El path es ".$path);
-                    Storage::disk('private')->delete($path);
+                  $path = ltrim($dir->folderPath ?? $dir->id, '/'); // quita el "/" inicial
+Log::info("Intentando borrar: " . Storage::disk('private')->path($path));
+Storage::disk('private')->deleteDirectory($path);
+
                 }
             });
     }

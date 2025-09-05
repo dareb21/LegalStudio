@@ -11,5 +11,6 @@ class DeleteFolders extends Command
     public function handle()
     {
         jobDeleteFolders::dispatch();
+          $this->info('MiJob ha sido ejecutado.');
     }
 }

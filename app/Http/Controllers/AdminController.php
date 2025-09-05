@@ -23,13 +23,30 @@ class AdminController extends Controller
 
     public function banThisUser($userId)
     {
-        User::where("id", $userId)->update(["banned" => 1]); 
+    $userInfo=  User::findOrFail($userId);
+if ($userInfo->role === "Admin")
+{
+    return response()->json("Accion no permitida",403);
+}
+     $userInfo->banned = 1;
+     $userInfo->save();
+    Logger::create([
+    "who" => 3,
+    "details" => "Pedro Garcia bloqueo a " .$userInfo->name . " el dia " . $this->now,
+]);
     return response()->json("Usuario bloqueado con exito");
     }
 
     public function unBanThisUser($userId)
-    {
-        User::where("id", $userId)->update(["banned" => 0]);
+    { 
+        $userInfo=  User::findOrFail($userId);
+        $userInfo->banned = 1;
+        $userInfo->save();
+     Logger::create([
+    "who" => 3,
+    "details" => "Pedro Garcia quito el bloqueo a " .$userInfo->name . " el dia " . $this->now,
+]);
+
     return response()->json("Usuario desbloqueado con exito");
     }
 
@@ -45,19 +62,26 @@ public function seeBans()
     public function newUser(Request $request)
     {
       
-      User::create([
+     $newUser= User::create([
                  "name"=> $request->name,
                 "birthday"=>$request->birthday,
                 "email"=>$request->email,
                 "phone"=>$request->phone,
                 "role"=>$request->role,
             ]);
+
+               Logger::create([
+    "who" => 3,
+    "details" => "Pedro Garcia creo un usuario nuevo del tipo " .$newUser->role . " el dia " . $this->now,
+]);
+     
         //Log::info(Auth::user()->name ." creo un nuevo usuario bajo el nombre de  ". $request->name ."y le asigno el rol de ". $request->role. ". " . $this->now);      
     return response()->json("Usuario creado con exito!"); 
     } 
 
 public function editUser(Request $request,$userId)
 {
+    $userInfo = User::findOrFail($userId);
     $validated = $request->validate([
    "name"     => "string|filled",
    "birthday" => "date|before:today",
@@ -72,9 +96,27 @@ $emailTaken = User::where("email", $validated['email'])->first();
   {
     return response()->json("Este correo ya esta asignado a otro usuario");
   }
-
 }
+  $array=[
+        "name" =>"Nombre documento",
+        "birthday"=>"Sensibilidad de documento",
+        "email"=>"Descripcion de documento",
+        "phone"=>"Importancia de caso",
+        "role"=>"Nombre de Juez"
+    ];
+$changes = array_values(array_intersect_key($array, $validated));
+$string=" ";
+
+foreach ($changes as $change)
+{
+    $string.=",".$change;
+}
+$name=$userInfo->name;
 User::where('id', $userId)->update($validated);
+Logger::create([
+    "who" => 3,
+    "details" => "Pedro Garcia modifico los campos" .$string. "del usuario ".$name ." el dia ". $this->now
+]);
 
 return response()->json("Usuario actualizado con exito!"); 
   

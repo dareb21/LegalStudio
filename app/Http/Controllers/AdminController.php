@@ -40,7 +40,7 @@ if ($userInfo->role === "Admin")
     public function unBanThisUser($userId)
     { 
         $userInfo=  User::findOrFail($userId);
-        $userInfo->banned = 1;
+        $userInfo->banned = 0;
         $userInfo->save();
      Logger::create([
     "who" => 3,
@@ -137,6 +137,7 @@ public function allLogs(Request $request)
             ->when($dateStart && $dateEnd, function ($query) use ($dateStart, $dateEnd) {
             $query->whereBetween("created_at", [$dateStart, $dateEnd]);
         })
+        ->orderBy("created_at","DESC")
         ->paginate(30);
 $details= [];
         foreach ($logs as $log)
@@ -147,6 +148,7 @@ $details= [];
     return response()->json([
         "users"=>$users,
         "details"=>$details,
+        "pagination"=>$logs
     ]);
 }
 
@@ -165,6 +167,7 @@ public function specificLog($userId,Request $request)
         ->when($dateStart && $dateEnd, function ($query) use ($dateStart, $dateEnd) {
             $query->whereBetween("created_at", [$dateStart, $dateEnd]);
         })
+     ->orderBy("created_at","DESC")
         ->paginate(30);
 
 $details= [];
@@ -176,6 +179,8 @@ $details= [];
 
     return response()->json([
         "details" => $details,
+        "pagination"=>$userInfo
+    
     ]);
 }
 

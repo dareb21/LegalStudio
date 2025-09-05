@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('birthday');
             $table->string('email')->unique();
             $table->string('phone')->unique() ;
-            $table->enum('role', ['admin', 'Abogado', 'Asistente']);
+            $table->enum('role', ['Admin', 'Abogado', 'Asistente']);
             $table->boolean("banned")->default(0);
             $table->rememberToken();
             $table->timestamps();

@@ -65,7 +65,7 @@ class LaywerController extends Controller
        
    Logger::create([
     "who" => 1,
-    "doc"=>$thisDoc,
+    "doc"=>$thisDoc->id,
     "details" => "Carlos Palma elimino el documento ". $docName  .  " el dia " . $this->now,
 ]);
    

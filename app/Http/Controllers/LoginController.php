@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class LoginController extends Controller
 {
@@ -25,44 +25,11 @@ try
             {   
                 return abort(404);
             }
+$tempToken = $user->createToken("temp_token", ['exchange'], now()->addMinutes(5))->plainTextToken;
+$paramTempToken = "tempToken=".$tempToken; 
+$paramUrlPhoto = "photo=".$googleUser->getAvatar();
+return redirect()->to('https://estudiolegalhn.com/#'.$paramTempToken.'&'.$paramUrlPhoto);
 
-$params = "?success=true"; 
-        return redirect()->to('https://estudiolegalhn.com/'.$params.'/'.$user->id);
-
-$authToken = $user->createToken("auth_token")->plainTextToken;  
-$userInfo=[];
-$userInfo = [
-    "role" => $user->role,
-    "name" => $googleUser->getName(),
-    "photo" => $googleUser->getAvatar(),
-    "email" => $googleUser->getEmail()
-];
-$encrypToken = Crypt::encryptString($authToken);
-
-        $cookieRole = cookie(
-            "user_role",
-             json_encode($userInfo),
-            20,
-            '/',
-             '.estudiolegalhn.com',
-            true,      // secure
-            false,     // httpOnly (false para que JS pueda leerla)
-            false,
-            'None'
-        );
-        
-        $authCookie = cookie(
-            "tsepf",
-            $encrypToken,
-            60,
-            "/",
-            ".estudiolegalhn.com",
-            true,
-            true,
-            false,
-            "none" 
-        );
-        
    }
     catch(Exception $e)
     {
@@ -71,11 +38,38 @@ $encrypToken = Crypt::encryptString($authToken);
     }
 }
 
-public function roleUser(Request $request)
+public function authUser(Request $request)
 {
-        $role = $request->cookie("user_role");
-        return response()->json([
-            "userRole"=>$role,
-        ]);
+         $authToken= PersonalAccessToken::findToken($request->bearerToken());
+        if (!$authToken)
+        {
+            return response()->json(["error" => "No se recibio el token de acceso."], 401);
+        }
+
+    if (!$authToken->can('exchange')) {
+        $authToken->delete();
+        return response()->json(["error" => "Token sin permisos"], 403);
+    }
+
+     if ($authToken->expires_at && $authToken->expires_at->isPast()) {
+        $authToken->delete();
+        return response()->json(["error" => "Token expirado"], 401);
+    }
+ $user= $authToken->tokenable;
+
+ $abilities = match($user->role) {
+    "Asistente" => ['Asistente'],
+    "Abogado"   => ['Abogado'],
+    "Admin"     => ['Admin'],
+    default     => ['*'], 
+};
+
+ $token = $user->createToken("auth_token", $abilities, now()->addMinutes(15))->plainTextToken;
+
+  return response()->json([
+        "name"=>$user->name,
+        "email"=>$user->email,
+        "role"=>$user->role,
+    ])->header("Authorization","Bearer ".$token);
 }
 }

@@ -6,6 +6,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LaywerController;
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get("/authUser",[LoginController::class, 'authUser']);
+
 
     Route::post("/uploadDoc/{thisDir}",[GeneralController::class, 'uploadDoc']);
     

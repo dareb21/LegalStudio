@@ -17,12 +17,11 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-            $user= Auth::user();
-
-        if ($user && in_array($user->role,$roles))
+     $token = $request->user()->currentAccessToken(); 
+        if ($token->can('Admin'))
         {
             return $next($request);
         }
-      return abort(401); 
+      return abort(404); 
     }
 }

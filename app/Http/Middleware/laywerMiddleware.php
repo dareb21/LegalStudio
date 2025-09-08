@@ -17,14 +17,11 @@ class laywerMiddleware
      */
     public function handle(Request $request, Closure $next, ...$role): Response
     {
-        $user= Auth::user();
-        if ($user && in_array($user->role,$role) )
+       $token = $request->user()->currentAccessToken();
+        if ($token->can('Abogado'))
         {
             return $next($request);
         }
-       return response()->json([
-        "su rol debe ser"=> $role,
-        "su rol es"=>$user->role
-       ]);
+       return abort(404);
     }
 }

@@ -17,17 +17,17 @@ return [
 
     'paths' => ['api/*'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['get','post','patch','put','delete'],
 
-    'allowed_origins' => ['https://estudiolegalhn.com','https://api.estudiolegalhn.com'],
+    'allowed_origins' => ['https://estudiolegalhn.com'],
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+   'allowed_headers' => ['Authorization', 'Content-Type'],
 
-    'exposed_headers' => [],
+    'exposed_headers' => ['Authorization'],
 
-    'max_age' => 0,
+    'max_age' => 3600,
 
     'supports_credentials' => true,
 

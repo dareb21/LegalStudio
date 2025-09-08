@@ -18,24 +18,28 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post("/makeDir",[GeneralController::class, 'makeDir']);
     Route::get("/downloadDoc/{thisDoc}",[GeneralController::class, 'downloadDoc']);
     Route::post("/downloadRequest/{thisDoc}",[GeneralController::class, 'downloadRequest']);
+    
+    Route::middleware("adminMiddleware")->group(function(){
+        Route::get('/users', [AdminController::class, 'showUsers']);
+        Route::post('/newUser', [AdminController::class, 'newUser']);
+        Route::patch('/banThisUser/{userId}', [AdminController::class, 'banThisUser']);
+        Route::patch('/unBanThisUser/{userId}', [AdminController::class, 'unBanThisUser']);
+        Route::put('/editUser/{userId}', [AdminController::class, 'editUser']);
+        Route::get('/seeBans', [AdminController::class, 'seeBans']);
+    });
 
-    Route::get('/users', [AdminController::class, 'showUsers']);
-    Route::post('/newUser', [AdminController::class, 'newUser']);
-    Route::patch('/banThisUser/{userId}', [AdminController::class, 'banThisUser']);
-    Route::patch('/unBanThisUser/{userId}', [AdminController::class, 'unBanThisUser']);
-    Route::put('/editUser/{userId}', [AdminController::class, 'editUser']);
-    Route::get('/seeBans', [AdminController::class, 'seeBans']);
-
-    Route::get('/seeRequest', [LaywerController::class, 'seeRequest']);   
-    Route::patch('/replyRequest/{thisRequest}', [LaywerController::class, 'replyRequest']);
-    Route::delete('/deleteDoc/{thisDoc}', [LaywerController::class, 'deleteDoc']);
-    Route::delete('/deleteDir/{thisDir}', [LaywerController::class, 'deleteDir']);
-    Route::get('/recycle/{dirType}', [LaywerController::class, 'recycleCan']);
-    Route::patch('/restore/{thisDoc}', [LaywerController::class, 'restoreDoc']);
-    Route::patch('/restoreDir/{thisDir}', [LaywerController::class, 'restoreDir']);
-    Route::patch('/finished/{thisDir}', [LaywerController::class, 'finishThisCase']);
-    Route::get('/logs', [LaywerController::class, 'logs']);    
-    Route::put('/updateDir/{thisDir}', [LaywerController::class, 'updateDir']);  
-    Route::put('/updateDoc/{thisDoc}', [LaywerController::class, 'updateDoc']);  
+    Route::middleware("laywerMiddleware")->group(function(){
+        Route::get('/seeRequest', [LaywerController::class, 'seeRequest']);   
+        Route::patch('/replyRequest/{thisRequest}', [LaywerController::class, 'replyRequest']);
+        Route::delete('/deleteDoc/{thisDoc}', [LaywerController::class, 'deleteDoc']);
+        Route::delete('/deleteDir/{thisDir}', [LaywerController::class, 'deleteDir']);
+        Route::get('/recycle/{dirType}', [LaywerController::class, 'recycleCan']);
+        Route::patch('/restore/{thisDoc}', [LaywerController::class, 'restoreDoc']);
+        Route::patch('/restoreDir/{thisDir}', [LaywerController::class, 'restoreDir']);
+        Route::patch('/finished/{thisDir}', [LaywerController::class, 'finishThisCase']);
+        Route::get('/logs', [LaywerController::class, 'logs']);    
+        Route::put('/updateDir/{thisDir}', [LaywerController::class, 'updateDir']);  
+        Route::put('/updateDoc/{thisDoc}', [LaywerController::class, 'updateDoc']);  
+});
 
 });

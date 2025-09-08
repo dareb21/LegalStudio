@@ -19,7 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get("/downloadDoc/{thisDoc}",[GeneralController::class, 'downloadDoc']);
     Route::post("/downloadRequest/{thisDoc}",[GeneralController::class, 'downloadRequest']);
     
-    Route::middleware("adminMiddleware")->group(function(){
+    Route::middleware("isAdmin")->group(function(){
         Route::get('/users', [AdminController::class, 'showUsers']);
         Route::post('/newUser', [AdminController::class, 'newUser']);
         Route::patch('/banThisUser/{userId}', [AdminController::class, 'banThisUser']);
@@ -30,7 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     });
 
-    Route::middleware("laywerMiddleware")->group(function(){
+    Route::middleware("isLawyer")->group(function(){
         Route::get('/seeRequest', [LaywerController::class, 'seeRequest']);   
         Route::patch('/replyRequest/{thisRequest}', [LaywerController::class, 'replyRequest']);
         Route::delete('/deleteDoc/{thisDoc}', [LaywerController::class, 'deleteDoc']);
@@ -39,7 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/restore/{thisDoc}', [LaywerController::class, 'restoreDoc']);
         Route::patch('/restoreDir/{thisDir}', [LaywerController::class, 'restoreDir']);
         Route::patch('/finished/{thisDir}', [LaywerController::class, 'finishThisCase']);
-        Route::get('/logs', [LaywerController::class, 'logs']);    
+        Route::get('/logs', [LaywerController::class, 'quickLogs']);    
         Route::put('/updateDir/{thisDir}', [LaywerController::class, 'updateDir']);  
         Route::put('/updateDoc/{thisDoc}', [LaywerController::class, 'updateDoc']);
         Route::get('/docActivity/{thisDoc}', [LaywerController::class, 'docActivity']);  

@@ -26,6 +26,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/unBanThisUser/{userId}', [AdminController::class, 'unBanThisUser']);
         Route::put('/editUser/{userId}', [AdminController::class, 'editUser']);
         Route::get('/seeBans', [AdminController::class, 'seeBans']);
+        Route::get("/allLogs", [AdminController::class, 'allLogs']);
+
     });
 
     Route::middleware("laywerMiddleware")->group(function(){
@@ -39,7 +41,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/finished/{thisDir}', [LaywerController::class, 'finishThisCase']);
         Route::get('/logs', [LaywerController::class, 'logs']);    
         Route::put('/updateDir/{thisDir}', [LaywerController::class, 'updateDir']);  
-        Route::put('/updateDoc/{thisDoc}', [LaywerController::class, 'updateDoc']);  
+        Route::put('/updateDoc/{thisDoc}', [LaywerController::class, 'updateDoc']);
+        Route::get('/docActivity/{thisDoc}', [LaywerController::class, 'docActivity']);  
 });
 
 });

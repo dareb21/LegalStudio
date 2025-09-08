@@ -167,7 +167,8 @@ public function uploadDoc(Request $request,$thisDir)
         "judge" => "nullable|string",
        "isSensitive" => "required|boolean",
          'file' => 'required|file|max:1992294',  
-      ]);  
+      ]); 
+$user = Auth::user();
   DB::beginTransaction();
 try { 
     $folder = Folder::select("folderPath","id","type")->where("id",$thisDir)->first();
@@ -195,7 +196,7 @@ $file->storeAs($folderPath,$fileName,"estudioLegal");
           "folderPath" =>   $folderPath,
           "description"    => $request->description,
           "judge"          => $request->judge,
-          "whoMadeIt"      => "Carlos",//Auth::user()->name,
+          "whoMadeIt"      => $user->name,
           "isSensitive"    => $request->isSensitive,
           "important" => $request->important
         ]);
@@ -216,9 +217,9 @@ switch ($folder->type) {
 
 
 Logger::create([
-    "who" => 1,
+    "who" => $user->id,
     "doc"=> $doc->id,
-    "details" => "Carlos subio el documento: " . $fileName . " el dia " . $this->now." en el area: " . $logType,
+    "details" => $user->name . " subio el documento: " . $fileName . " el dia " . $this->now." en el area: " . $logType,
 ]);
         DB::commit();
     

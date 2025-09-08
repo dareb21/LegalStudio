@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\Crypt;
 
 class LoginController extends Controller
 {
@@ -27,6 +25,11 @@ try
             {   
                 return abort(404);
             }
+
+$params = "?success=true"; 
+        return redirect()->to('https://estudiolegalhn.com/'.$params.'/'.$user->id);
+
+$authToken = $user->createToken("auth_token")->plainTextToken;  
 $userInfo=[];
 $userInfo = [
     "role" => $user->role,
@@ -34,6 +37,8 @@ $userInfo = [
     "photo" => $googleUser->getAvatar(),
     "email" => $googleUser->getEmail()
 ];
+$encrypToken = Crypt::encryptString($authToken);
+
         $cookieRole = cookie(
             "user_role",
              json_encode($userInfo),
@@ -44,22 +49,20 @@ $userInfo = [
             false,     // httpOnly (false para que JS pueda leerla)
             false,
             'None'
-        );$params = "?success=true"; 
-        return redirect()->to('https://estudiolegalhn.com/'.$params)->withCookies([$cookieRole]);
-
-        /*  $token = $user->createToken("auth_token")->plainTextToken;          
-$cookie = cookie(
-        'auth_token',         
-        $token,              
-        60*24*7,           
-        '/',                 
-        '.midominio.com/',    
-        true,                
-        true,                
-        false,                
-        'None'                
-    );*/
-
+        );
+        
+        $authCookie = cookie(
+            "tsepf",
+            $encrypToken,
+            60,
+            "/",
+            ".estudiolegalhn.com",
+            true,
+            true,
+            false,
+            "none" 
+        );
+        
    }
     catch(Exception $e)
     {

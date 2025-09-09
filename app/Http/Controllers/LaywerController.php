@@ -39,18 +39,17 @@ class LaywerController extends Controller
         $request->validate([
            "reply"=>"required|boolean"
         ]);
-      
+$user = $request->user();  
         $thisRequest->update([    // Esto se puede hacer en una sola consulta
             "status"=>$request->reply,
-            "responded_by"=>2, 
+            "responded_by"=>$user->id, 
             "responseDate"=>$this->now
         ]);
-      $status = $request->reply ? "aprobo":"rechazo";
+      $status = $request->reply ? "aprobò":"rechazò";
    Logger::create([
-    "who" => 2,
-    "details" => "Pedro Garcia ". $status  . "la solicitud numero" . $thisRequest->id . " el dia " . $this->now,
+    "who" => $user->id,
+    "details" => $user->name . $status  . "la solicitud de descarga de: " . $thisRequest->requested_by_name . " con fin de descargar el documento ".$thisRequest->document_name . " el dia " . $this->now,
 ]);
-        
     return response()->json([
         "statusP" => "Su solicitud fue ". $status,
     ]);
@@ -58,15 +57,18 @@ class LaywerController extends Controller
 
     public function deleteDoc(Document $thisDoc)
     {;
-        $thisDoc->deleted_by = 1; //Auth::user()->name; esto con un update se puede hacer
-        $thisDoc->deleted_at=$this->now;
+        $user = $request->user();  
+        Document::where("id",$thisDoc)->update([
+            "deleted_by"=>$user->id,
+            "deleted_at"=> $this->now,
+            "deleted_by_name"=>$user->name,
+        ]);
         $docName = $thisDoc->documentName; 
-        $thisDoc->save(); 
-       
+        
    Logger::create([
-    "who" => 1,
+    "who" => $user->id,
     "doc"=>$thisDoc->id,
-    "details" => "Carlos Palma elimino el documento ". $docName  .  " el dia " . $this->now,
+    "details" => $user->name ." elimino el documento ". $docName  .  " el dia " . $this->now,
 ]);
    
         return response()->json("El archivo se mando a la bandeja de reciclaje");
@@ -74,13 +76,17 @@ class LaywerController extends Controller
 
     public function deleteDir(Folder $thisDir)
     {
-        $thisDir->deleted_by = 1; //Auth::user()->name;
+        $user = $request->user();  
         $dirName = $thisDir->folderName;
-        $thisDir->deleted_at=$this->now;
-        $thisDir->save();
+        Folder::where("id",$thisDir)->update([
+            "deleted_by"=>$user->id,
+            "deleted_at"=>$this->now,
+            "deleted_by"=>$user->name,
+        ]);
+
 Logger::create([
-    "who" => 1,
-    "details" => "Carlos Palma elimino la carpeta ". $dirName  .  " el dia " . $this->now,
+    "who" => $user->id,
+    "details" => $user->name." elimino la carpeta ". $dirName  .  " el dia " . $this->now,
 ]);
          
     return response()->json("La carpeta se mando a la bandeja de reciclaje");
@@ -111,45 +117,49 @@ Logger::create([
     }
 
     public function restoreDoc($thisDoc) 
-    {
+    { 
+        $user = $request->user();
         $doc = Document::withTrashed()->find($thisDoc); //esto es otro update solo que con trashed
         $docName = $doc->documentName;
         $doc->deleted_by = null;
         $doc->deleted_at=null;
+        $doc->deleted_by_name=null;
         $doc->save();
 Logger::create([
-    "who" => 1,
+    "who" => $user->id,
     "doc"=>$thisDoc,
-    "details" => "Carlos restauro el documento ". $docName  .  " el dia " . $this->now,
+    "details" => $user->name . " restauro el documento ". $docName  .  " el dia " . $this->now,
 ]);
     return response()->json("Archivo restaurado");
     }
 
     public function restoreDir($thisDir)
     {
+        $user = $request->user();
         $folder=Folder::withTrashed()->find($thisDir);
         $folderName = $folder->folderName;
         $folder->deleted_at = null;
         $folder->deleted_by = null;
+        $folder->deleted_by_name=null;
         $folder->save();
      
    Logger::create([
-    "who" => 1,
-    "details" => "Carlos restauro la carpeta ". $folderName  .  " el dia " . $this->now,
+    "who" => $user->id,
+    "details" => $user->name . " restauro la carpeta ". $folderName  .  " el dia " . $this->now,
 ]); return response()->json("Carpeta restaurada");
     }
 
     public function finishThisCase(Folder $thisDir, Request $request)
 {
+$user = $request->user();
     $data = [];
     $toDeleteInfo = [];
     $toSave = [];
 
     $toDelete = $request->toDelete;
-    $toSave = $request->toSave; //Creo que esto se puede ir
-
+   
     $toDeleteInfo["deleted_at"] = $this->now;
-    $toDeleteInfo["deleted_by"] = 1;
+    $toDeleteInfo["deleted_by"] =$user->id;
     
 
     DB::beginTransaction();
@@ -212,8 +222,8 @@ if ($thisDir->folderPath == null)
         Document::whereIn("id",$toDelete)->update($toDeleteInfo);
 
        Logger::create([
-            "who" => 1,
-            "details" => "Cerro el caso ". $thisDir->folderName  .  " el dia " . $this->now,
+            "who" => $user->id,
+            "details" => $user->name ." Cerro el caso ". $thisDir->folderName  .  " el dia " . $this->now,
         ]);  
 
         DB::commit(); 
@@ -243,9 +253,15 @@ public function updateDir($thisDir, Request $request)
      $request->validate([
            "folderName"=>"required|string|filled"
         ]);
+    $user = $request->user(); 
     Folder::where("id",$thisDir)->update([
     "folderName"=>$request->folderName,
     ]);
+
+    Logger::create([
+    "who" => $user->id,
+    "details" =>$user->name." modifico el nombre de la carpeta: ".$request->folderName ." el dia " . $this->now,
+]);
    return response()->noContent();
 }
 
@@ -265,19 +281,23 @@ public function updateDoc($thisDoc, Request $request)
         "important"=>"Importancia de caso",
         "judge"=>"Nombre de Juez"
     ];
-$changes = array_values(array_intersect_key($array, $validated));
-$string=" ";
-
-foreach ($changes as $change)
-{
-    $string.=",".$change;
+ $doc= Document::where("id",$thisDoc)->first()->toArray();   
+ $user = $request->user();
+ 
+$changes = array_intersect_key($array, $validated);
+$oldData = array_intersect_key($doc, $changes);
+$string = "";
+foreach ($changes as $field => $label) {
+    $old = $oldData[$field] ?? 'N/A';          
+    $new = $request[$field] ?? 'N/A';     
+    $string .= $label." De:". $old. " A: ".$new. " ";
 }
-$doc= Document::where("id",$thisDoc)->select("documentName")->first();
+
 Document::where('id', $thisDoc)->update($validated);
 Logger::create([
-    "who" => 1,
+    "who" => $user->id,
     "doc"=>$thisDoc,
-    "details" => "Carlos modifico los campos: ". $string  ." del documento: ".$doc->documentName ." el dia " . $this->now,
+    "details" =>$user->name." modifico los campos: ". $string  ." del documento: ".$doc["documentName"] ." el dia " . $this->now,
 ]);
 return response()->noContent();
 }
@@ -289,4 +309,5 @@ return response([
     "logs"=>$logs
 ]);
 }
+
 }

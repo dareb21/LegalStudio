@@ -21,6 +21,7 @@ class Document extends Model
     "important",
     "hardDelete",
     "folderPath",
-    "deleted_by"
+    "deleted_by",
+    "deleted_by_name"
     ];
 }

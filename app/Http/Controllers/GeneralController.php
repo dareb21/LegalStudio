@@ -24,10 +24,6 @@ class GeneralController extends Controller
         $this->now = now()->setTimezone('America/Tegucigalpa')->format('Y-m-d H:i:s');
     }
 
-public function home()
-{
-    return view("prueba");
-}
     public function dashboard()
     { 
      //DeleteJob::dispatch();   
@@ -150,9 +146,10 @@ switch ($type) {
     default:
         $logType = 'Carpeta Desconocida';
 }
+ $user = $request->user(); 
 Logger::create([
-    "who" => 1,
-    "details" => "Juan Garcia creo una carpeta llamada: " . $folderName . ", del tipo: " . $logType . " el dia " . $this->now,
+    "who" => $user->id,
+    "details" => $user->name ." creo una carpeta llamada: " . $folderName . ", del tipo: " . $logType . " el dia " . $this->now,
 ]);
  return response()->json("Carpeta Creada con exito");
     }
@@ -168,8 +165,7 @@ public function uploadDoc(Request $request,$thisDir)
        "isSensitive" => "required|boolean",
          'file' => 'required|file|max:1992294',  
       ]); 
-$user = Auth::user();
-  DB::beginTransaction();
+ DB::beginTransaction();
 try { 
     $folder = Folder::select("folderPath","id","type")->where("id",$thisDir)->first();
     $file = $request->file('file');
@@ -215,7 +211,7 @@ switch ($folder->type) {
         $logType = 'Carpeta Desconocida';
 }
 
-
+ $user = $request->user(); 
 Logger::create([
     "who" => $user->id,
     "doc"=> $doc->id,
@@ -245,12 +241,14 @@ public function downloadDoc($thisDoc)
         return Storage::disk("estudioLegal")->download($path);
    }
 */
-    if ($docInfo->isSensitive == 0)
+ $user = $request->user(); 
+  
+ if ($docInfo->isSensitive == 0)
     {   
     Logger::create([
-    "who" => 1,
+    "who" => $user->id,
     "doc"=>$thisDoc,
-    "details" => "Carlos descargo el documento: " . $docInfo->documentName . " el dia " . $this->now,
+    "details" => $user->name." descargo el documento: " . $docInfo->documentName . " el dia " . $this->now,
 ]);
     
     return Storage::disk("estudioLegal")->download($path);
@@ -261,9 +259,9 @@ $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by"
     if (!$petition)
     {
         Logger::create([
-    "who" => 1,
+    "who" => $user->id,
     "doc"=>$thisDoc,
-    "details" => "Carlos intento descargar el documento: " . $docInfo->documentName . " el dia " . $this->now,
+    "details" => $user->name ." intento descargar el documento: " . $docInfo->documentName . " el dia " . $this->now,
 ]);
 
         return response()->json([
@@ -281,9 +279,9 @@ $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by"
     if ( $petition->status==1)
     {
         Logger::create([
-    "who" => 1,
+    "who" => $user->id,
     "doc"=>$thisDoc,
-    "details" => "Carlos descargo el documento: " . $docInfo->documentName . " el dia " . $this->now,
+    "details" => $user->name ." descargo el documento: " . $docInfo->documentName . " el dia " . $this->now,
 ]); 
 $petition->status = 0;
     $petition->save();
@@ -293,9 +291,9 @@ $petition->status = 0;
     //return Storage::disk("private")->download($path);
     }else
     {    Logger::create([
-    "who" => 1,
+    "who" => $user->id,
     "doc"=>$thisDoc,
-    "details" => "Carlos intento descargar el documento: " . $docInfo->documentName . " el dia " . $this->now." pero su solicitud fue rechazada",
+    "details" => $user->name ." intento descargar el documento: " . $docInfo->documentName . " el dia " . $this->now." pero su solicitud fue rechazada",
 ]);
   
         return response()->json([
@@ -304,23 +302,26 @@ $petition->status = 0;
     }    
 }
 
- public function downloadRequest($thisDoc)
+ public function downloadRequest(Document $thisDoc)
 { 
-    if (downloadRequest::where("document_id",$thisDoc)->where("requested_by",1)->whereNull("status")->exists())
+ $user = $request->user(); 
+    if (downloadRequest::where("document_id",$thisDoc)->where("requested_by",$user->id)->whereNull("status")->exists())
     {
         return response()->json([
            "statusP"=>"Ya existe una solicitud pendiente para este documento"
         ]);
     }
    $requestNum= DownloadRequest::create([
-        "document_id"=>$thisDoc,
+        "document_id"=>$thisDoc->id,
         "requestDate"=>$this->now,
-        "requested_by"=> 1 //Auth::user()->id,
+        "document_name"=>$thisDoc->documentName,
+        "requested_by_name"=>$user->name,
+        "requested_by"=>$user->id,  //Auth::user()->id,
     ]);
 Logger::create([
-    "who" => 1,
+    "who" => $user->id,
     "doc"=>$thisDoc,
-    "details" => "Carlos solicito la descarga del documento con id " . $thisDoc . " el dia " . $this->now." con el numero de solicitud " . $requestNum->id,
+    "details" => $user->name ." solicito la descarga del documento " . $thisDoc->documentName . " el dia " . $this->now." con el numero de solicitud " . $requestNum->id,
 ]);
 
 

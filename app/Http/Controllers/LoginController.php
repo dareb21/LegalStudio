@@ -61,7 +61,8 @@ public function authUser(Request $request)
     "Asistente" => ['Asistente'],
     "Abogado"   => ['Abogado'],
     "Admin"     => ['Admin'],
-    default     => ['*'], 
+  default => response()->json(["error" => "Rol no autorizado"], 401),
+
 };
 
  $token = $user->createToken("auth_token", $abilities, now()->addMinutes(15))->plainTextToken;

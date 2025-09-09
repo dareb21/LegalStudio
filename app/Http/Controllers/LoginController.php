@@ -64,7 +64,7 @@ public function authUser(Request $request)
         return response()->json(["error" => "Token expirado"], 401);
     }
  $user= $authToken->tokenable;
-
+$authToken->delete();
  $abilities = match($user->role) {
     "Asistente" => ['Asistente'],
     "Abogado"   => ['Abogado'],
@@ -73,8 +73,7 @@ public function authUser(Request $request)
 
 };
 
- $token = $user->createToken("auth_token", $abilities, now()->addMinutes(30))->plainTextToken;
-
+ $token = $user->createToken("auth_token", $abilities, now()->addMinutes(10))->plainTextToken;
   return response()->json([
         "name"=>$user->name,
         "email"=>$user->email,

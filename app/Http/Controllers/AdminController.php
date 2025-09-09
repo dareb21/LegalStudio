@@ -21,7 +21,7 @@ class AdminController extends Controller
     return response()->json(User::where("banned",0)->paginate(10));
     }
 
-    public function banThisUser($userId)
+    public function banThisUser($userId, Request $request)
     {
 
     $userInfo=  User::findOrFail($userId);
@@ -39,7 +39,7 @@ if ($userInfo->role === "Admin")
     return response()->json("Usuario bloqueado con exito");
     }
 
-    public function unBanThisUser($userId)
+    public function unBanThisUser($userId,Request $request)
     { 
         $userInfo=  User::findOrFail($userId);
         $userInfo->banned = 0;
@@ -84,8 +84,10 @@ public function seeBans()
     return response()->json("Usuario creado con exito!"); 
     } 
 
-public function editUser(Request $request,$userId)
+public function edition(Request $request,$userId)
 {
+    try
+    {
     $userInfo = User::findOrFail($userId);
     
     $validated = $request->validate([
@@ -93,7 +95,7 @@ public function editUser(Request $request,$userId)
    "birthday" => "date|before:today",
    "email"    => "email",
    "phone"    => "size:8",
-   "role"     => "in:asistente,abogado"
+   "role"     => "in:Asistente,Abogado"
 ]);
  $user = $request->user(); 
 
@@ -124,7 +126,9 @@ Logger::create([
     "who" => $user->id,
     "details" =>$user->name . " modifico los campos" .$string. "del usuario ".$name ." el dia ". $this->now
 ]);
-
+} catch (\Illuminate\Validation\ValidationException $e) {
+    return response()->json(['errors' => $e->errors()], 422);
+}   
 return response()->json("Usuario actualizado con exito!"); 
   
 }

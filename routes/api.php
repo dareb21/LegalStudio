@@ -24,9 +24,9 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/newUser', [AdminController::class, 'newUser']);
             Route::patch('/banThisUser/{userId}', [AdminController::class, 'banThisUser']);
             Route::patch('/unBanThisUser/{userId}', [AdminController::class, 'unBanThisUser']);
-            Route::put('/editUser/{userId}', [AdminController::class, 'editUser']);
             Route::get('/seeBans', [AdminController::class, 'seeBans']);
             Route::get("/allLogs", [AdminController::class, 'allLogs']);
+            Route::patch("/edition/{userId}",[AdminController::class,"edition"]);
         });
 
         Route::middleware("isLawyer")->group(function(){

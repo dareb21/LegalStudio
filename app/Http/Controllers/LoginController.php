@@ -8,6 +8,14 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class LoginController extends Controller
 {
+  
+ private $now;
+
+    public function __construct()
+    {
+        $this->now = now()->setTimezone('America/Tegucigalpa')->format('Y-m-d H:i:s');
+    }
+  
  public function logIn()
     {
         
@@ -65,7 +73,7 @@ public function authUser(Request $request)
 
 };
 
- $token = $user->createToken("auth_token", $abilities, now()->addMinutes(15))->plainTextToken;
+ $token = $user->createToken("auth_token", $abilities, now()->addMinutes(30))->plainTextToken;
 
   return response()->json([
         "name"=>$user->name,
@@ -73,4 +81,24 @@ public function authUser(Request $request)
         "role"=>$user->role,
     ])->header("Authorization","Bearer ".$token);
 }
+
+public function refreshUser(Request $request)
+{
+  $oldToken= PersonalAccessToken::findToken($request->bearerToken());
+  if (!$oldToken)
+  {
+    return response()->json([
+        "Message"=>"Token no valido",
+    ]);
+  }
+  $user= $oldToken->tokenable;
+  $abilities = $oldToken->abilities; 
+  $oldToken->delete();
+ $token = $user->createToken("auth_token", $abilities, now()->addMinutes(30))->plainTextToken;
+ 
+ return response()->json([
+    "status"=>"ok"
+ ])->header("Authorization","Bearer ".$token);  
+}
+
 }

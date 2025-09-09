@@ -48,7 +48,7 @@ return redirect()->to('https://estudiolegalhn.com/#'.$paramTempToken.'&'.$paramU
 
 public function authUser(Request $request)
 {
-         $authToken= PersonalAccessToken::findToken($request->bearerToken());
+         $authToken= $request->user()->currentAccessToken();
         if (!$authToken)
         {
             return response()->json(["error" => "No se recibio el token de acceso."], 401);
@@ -84,7 +84,7 @@ public function authUser(Request $request)
 
 public function refreshUser(Request $request)
 {
-  $oldToken= PersonalAccessToken::findToken($request->bearerToken());
+  $oldToken= $request->user()->currentAccessToken();
   if (!$oldToken)
   {
     return response()->json([

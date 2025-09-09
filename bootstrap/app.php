@@ -15,9 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
          $middleware->alias([
             'isAdmin' => \App\Http\Middleware\AdminMiddleware::class,
             'isLawyer'=>\App\Http\Middleware\laywerMiddleware::class,
+            'notExchange'=>\App\Http\Middleware\notExchangeMiddleware::class,
         ]);
         $middleware->validateCsrfTokens(except:[
-            "/*"
         ]);
 })
     ->withExceptions(function (Exceptions $exceptions): void {

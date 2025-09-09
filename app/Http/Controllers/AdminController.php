@@ -77,7 +77,7 @@ public function seeBans()
 
                Logger::create([
     "who" => $user->id,
-    "details" =>$user->name . "creo un usuario nuevo del tipo " .$newUser->role . " el dia " . $this->now,
+    "details" =>$user->name . " creo un nuevo usuario llamado" .$newUser->name. " del tipo " .$newUser->role . " el dia " . $this->now,
 ]);
      
         //Log::info(Auth::user()->name ." creo un nuevo usuario bajo el nombre de  ". $request->name ."y le asigno el rol de ". $request->role. ". " . $this->now);      

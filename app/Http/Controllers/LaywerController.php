@@ -58,7 +58,7 @@ $user = $request->user();
     public function deleteDoc(Document $thisDoc, Request $request)
     {;
         $user = $request->user();  
-        Document::where("id",$thisDoc)->update([
+        Document::where("id",$thisDoc->id)->update([
             "deleted_by"=>$user->id,
             "deleted_at"=> $this->now,
             "deleted_by_name"=>$user->name,
@@ -78,10 +78,10 @@ $user = $request->user();
     {
         $user = $request->user();  
         $dirName = $thisDir->folderName;
-        Folder::where("id",$thisDir)->update([
+        Folder::where("id",$thisDir->id)->update([
             "deleted_by"=>$user->id,
             "deleted_at"=>$this->now,
-            "deleted_by"=>$user->name,
+            "deleted_by_name"=>$user->name,
         ]);
 
 Logger::create([

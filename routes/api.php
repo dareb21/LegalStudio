@@ -5,8 +5,6 @@ use App\Http\Controllers\GeneralController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LaywerController;
 
- Route::post("/makeDir",[GeneralController::class, 'makeDir']);
-
 Route::middleware('auth:sanctum')->group(function () {
     Route::get("/authUser",[LoginController::class, 'authUser']);
     
@@ -17,9 +15,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/dirs/{type}",[GeneralController::class, 'showDirs']);
         Route::get("/thisDir/{thisDir}",[GeneralController::class, 'showThisDir']);
         Route::get("/docsInThisDir/{thisDir}",[GeneralController::class, 'showDocs']);
+        Route::post("/makeDir",[GeneralController::class, 'makeDir']);
         Route::get("/downloadDoc/{thisDoc}",[GeneralController::class, 'downloadDoc']);
         Route::post("/downloadRequest/{thisDoc}",[GeneralController::class, 'downloadRequest']);
-    
         Route::middleware("isAdmin")->group(function(){
             Route::get('/users', [AdminController::class, 'showUsers']);
             Route::post('/newUser', [AdminController::class, 'newUser']);

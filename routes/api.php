@@ -18,6 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post("/makeDir",[GeneralController::class, 'makeDir']);
         Route::get("/downloadDoc/{thisDoc}",[GeneralController::class, 'downloadDoc']);
         Route::post("/downloadRequest/{thisDoc}",[GeneralController::class, 'downloadRequest']);
+
         Route::middleware("isAdmin")->group(function(){
             Route::get('/users', [AdminController::class, 'showUsers']);
             Route::post('/newUser', [AdminController::class, 'newUser']);
@@ -27,22 +28,24 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get("/allLogs", [AdminController::class, 'allLogs']);
             Route::put("/editUser/{userId}",[AdminController::class,"edition"]);
         });
-
-        Route::middleware("isLawyer")->group(function(){
+        Route::middleware("logsAndDown")->group(function(){
+            Route::get('/logs', [LaywerController::class, 'quickLogs']);    
             Route::get('/seeRequest', [LaywerController::class, 'seeRequest']);   
             Route::patch('/replyRequest/{thisRequest}', [LaywerController::class, 'replyRequest']);
+        });
+
+        Route::middleware("isLawyer")->group(function(){
             Route::delete('/deleteDoc/{thisDoc}', [LaywerController::class, 'deleteDoc']);
             Route::delete('/deleteDir/{thisDir}', [LaywerController::class, 'deleteDir']);
             Route::get('/recycle/{dirType}', [LaywerController::class, 'recycleCan']);
             Route::patch('/restore/{thisDoc}', [LaywerController::class, 'restoreDoc']);
             Route::patch('/restoreDir/{thisDir}', [LaywerController::class, 'restoreDir']);
             Route::patch('/finished/{thisDir}', [LaywerController::class, 'finishThisCase']);
-            Route::get('/logs', [LaywerController::class, 'quickLogs']);    
             Route::put('/updateDir/{thisDir}', [LaywerController::class, 'updateDir']);  
             Route::put('/updateDoc/{thisDoc}', [LaywerController::class, 'updateDoc']);
             Route::get('/docActivity/{thisDoc}', [LaywerController::class, 'docActivity']);  
         }); 
     });
-   
+          
 
 });

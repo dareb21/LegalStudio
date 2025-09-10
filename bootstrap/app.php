@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'isAdmin' => \App\Http\Middleware\AdminMiddleware::class,
             'isLawyer'=>\App\Http\Middleware\laywerMiddleware::class,
             'notExchange'=>\App\Http\Middleware\notExchangeMiddleware::class,
+            'logsAndDown'=>\App\Http\Middleware\logsAndDown::class,
         ]);
         $middleware->validateCsrfTokens(except:[
         ]);

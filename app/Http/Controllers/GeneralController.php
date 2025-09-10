@@ -227,7 +227,7 @@ Logger::create([
     }
 }
 
-public function downloadDoc($thisDoc)
+public function downloadDoc($thisDoc, Request $request)
 {
  $docInfo=Document::where("id",$thisDoc)->select("isSensitive","documentName","folderPath")->first();
  if (!$docInfo)
@@ -302,7 +302,7 @@ $petition->status = 0;
     }    
 }
 
- public function downloadRequest(Document $thisDoc)
+ public function downloadRequest(Document $thisDoc, Request $request)
 { 
  $user = $request->user(); 
     if (downloadRequest::where("document_id",$thisDoc)->where("requested_by",$user->id)->whereNull("status")->exists())

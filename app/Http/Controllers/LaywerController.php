@@ -55,7 +55,7 @@ $user = $request->user();
     ]);
     }
 
-    public function deleteDoc(Document $thisDoc)
+    public function deleteDoc(Document $thisDoc, Request $request)
     {;
         $user = $request->user();  
         Document::where("id",$thisDoc)->update([
@@ -74,7 +74,7 @@ $user = $request->user();
         return response()->json("El archivo se mando a la bandeja de reciclaje");
     }
 
-    public function deleteDir(Folder $thisDir)
+    public function deleteDir(Folder $thisDir, Request $request)
     {
         $user = $request->user();  
         $dirName = $thisDir->folderName;
@@ -116,7 +116,7 @@ Logger::create([
         ]);
     }
 
-    public function restoreDoc($thisDoc) 
+    public function restoreDoc($thisDoc, Request $request) 
     { 
         $user = $request->user();
         $doc = Document::withTrashed()->find($thisDoc); //esto es otro update solo que con trashed
@@ -133,7 +133,7 @@ Logger::create([
     return response()->json("Archivo restaurado");
     }
 
-    public function restoreDir($thisDir)
+    public function restoreDir($thisDir, Request $request)
     {
         $user = $request->user();
         $folder=Folder::withTrashed()->find($thisDir);

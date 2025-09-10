@@ -165,6 +165,7 @@ public function uploadDoc(Request $request,$thisDir)
        "isSensitive" => "required|boolean",
          'file' => 'required|file|max:1992294',  
       ]); 
+ $user = $request->user(); 
  DB::beginTransaction();
 try { 
     $folder = Folder::select("folderPath","id","type")->where("id",$thisDir)->first();

@@ -10,15 +10,13 @@ class LoginController extends Controller
 {
   
  private $now;
-
     public function __construct()
     {
-        $this->now = now()->setTimezone('America/Tegucigalpa')->format('Y-m-d H:i:s');
+     $this->now = now()->setTimezone('America/Tegucigalpa')->format('Y-m-d H:i:s');
     }
   
  public function logIn()
-    {
-        
+    {   
         return Socialite::driver("google")->stateless()->redirect();
     }
 
@@ -73,11 +71,12 @@ $authToken->delete();
 
 };
 
- $token = $user->createToken("auth_token", $abilities, now()->addMinutes(10))->plainTextToken;
+ $token = $user->createToken("auth_token", $abilities, now()->addMinutes(20))->plainTextToken;
   return response()->json([
         "name"=>$user->name,
         "email"=>$user->email,
         "role"=>$user->role,
+        "token"=>$token,
     ])->header("Authorization","Bearer ".$token);
 }
 

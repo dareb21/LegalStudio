@@ -71,12 +71,11 @@ $authToken->delete();
 
 };
 
- $token = $user->createToken("auth_token", $abilities, now()->addMinutes(20))->plainTextToken;
+ $token = $user->createToken("auth_token", $abilities, now()->addMinutes(10))->plainTextToken;
   return response()->json([
         "name"=>$user->name,
         "email"=>$user->email,
         "role"=>$user->role,
-        "token"=>$token,
     ])->header("Authorization","Bearer ".$token);
 }
 
@@ -92,7 +91,7 @@ public function refreshUser(Request $request)
   $user= $oldToken->tokenable;
   $abilities = $oldToken->abilities; 
   $oldToken->delete();
- $token = $user->createToken("auth_token", $abilities, now()->addMinutes(30))->plainTextToken;
+ $token = $user->createToken("auth_token", $abilities, now()->addMinutes(10))->plainTextToken;
  
  return response()->json([
     "status"=>"ok"

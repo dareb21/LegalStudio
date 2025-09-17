@@ -321,7 +321,7 @@ $petition->status = 0;
     ]);
 Logger::create([
     "who" => $user->id,
-    "doc"=>$thisDoc,
+    "doc"=>$thisDoc->id,
     "details" => $user->name ." solicito la descarga del documento " . $thisDoc->documentName . " el dia " . $this->now." con el numero de solicitud " . $requestNum->id,
 ]);
 

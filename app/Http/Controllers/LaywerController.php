@@ -96,17 +96,21 @@ Logger::create([
         {
         if (!in_array($dirType,['active', 'finished', 'jurisprudence'])){
             return response()->json("Tipo de carpeta no valida");
-        }    
-          $documents =Document::onlyTrashed()
+        }  
+        
+        $documents =Document::onlyTrashed()
           ->join("folders","documents.folder_id","=","folders.id")
           ->whereNull("folders.hardDelete")
+          ->whereNull("documents.hardDelete")
           ->where("folders.type",$dirType)
+          ->orderBy("documents.deleted_at","desc")
           ->select("documents.id as docId","documents.documentName as docName","documents.description as docDesc","documents.whoMadeIt as whoUpload","documents.isSensitive","documents.deleted_at as deletedAt","documents.important","documents.judge","documents.deleted_by_name as deletedBy")
           ->paginate(10);
 
         $folder =Folder::onlyTrashed()
         ->where("type",$dirType)
         ->where("hardDelete",null)
+        ->orderBy("deleted_at","desc")
         ->paginate(10);
 
     return response()->json([
@@ -159,6 +163,7 @@ $user = $request->user();
    
     $toDeleteInfo["deleted_at"] = $this->now;
     $toDeleteInfo["deleted_by"] =$user->id;
+    $toDeleteInfo["deleted_by_name"] =$user->name;
     
 
     DB::beginTransaction();
@@ -205,6 +210,7 @@ if ($thisDir->folderPath == null)
                     SET folderPath = CASE id 
                     $cases 
                     END
+                    type = 'finished',
                     WHERE id IN ($idsStr)
                     AND id != {$thisDir->id}
                 ");
@@ -308,5 +314,24 @@ return response([
     "logs"=>$logs
 ]);
 }
+
+public function downloadDoc($thisDoc, Request $request)
+{
+ $docInfo=Document::where("id",$thisDoc)->select("documentName","folderPath")->first();
+ if (!$docInfo)
+ {
+    return response()->json("No se encontro este archivo.");
+ }
+ $path =ltrim($docInfo->folderPath . "/" . $docInfo->documentName);
+
+ $user = $request->user(); 
+  
+    Logger::create([
+    "who" => $user->id,
+    "doc"=>$thisDoc,
+    "details" => $user->name." descargo el documento: " . $docInfo->documentName . " el dia " . $this->now,
+]);    
+    return Storage::disk("estudioLegal")->download($path);
+    }
 
 }

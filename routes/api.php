@@ -35,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
         });
 
         Route::middleware("isLawyer")->group(function(){
+            Route::get("/lawyerDownloadDoc/{thisDoc}",[LaywerController::class, 'downloadDoc']);
             Route::delete('/deleteDoc/{thisDoc}', [LaywerController::class, 'deleteDoc']);
             Route::delete('/deleteDir/{thisDir}', [LaywerController::class, 'deleteDir']);
             Route::get('/recycle/{dirType}', [LaywerController::class, 'recycleCan']);

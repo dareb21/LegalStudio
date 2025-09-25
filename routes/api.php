@@ -9,6 +9,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get("/authUser",[LoginController::class, 'authUser']);
     
     Route::middleware("notExchange")->group(function (){
+        Routw::get("/logOut",[LoginController::class, 'logOut']);
         Route::get("/refreshUser",[LoginController::class, 'refreshUser']);
         Route::post("/uploadDoc/{thisDir}",[GeneralController::class, 'uploadDoc']); 
         Route::get("/dashboard",[GeneralController::class, 'dashboard']);

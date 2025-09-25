@@ -236,12 +236,7 @@ public function downloadDoc($thisDoc, Request $request)
     return response()->json("No se encontro este archivo.");
  }
  $path =ltrim($docInfo->folderPath . "/" . $docInfo->documentName);
-//Hacer endpoint para descargar documentos PARA ABOGADOS 
-/*if (Laywer::where("user_id",Auth::user()->id )->exists())
-   {
-        return Storage::disk("estudioLegal")->download($path);
-   }
-*/
+
  $user = $request->user(); 
   
  if ($docInfo->isSensitive == 0)
@@ -256,7 +251,7 @@ public function downloadDoc($thisDoc, Request $request)
     //return Storage::disk("private")->download($path);        
     }
 
-$petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by",1)->orderBy('created_at', 'desc')->first();
+$petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by",$user->id)->orderBy('created_at', 'desc')->first();
     if (!$petition)
     {
         Logger::create([

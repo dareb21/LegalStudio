@@ -98,4 +98,15 @@ public function refreshUser(Request $request)
  ])->header("Authorization","Bearer ".$token);  
 }
 
+public function logOut(Request $request)
+{
+  $userToken= $request->user()->currentAccessToken();
+    if ($userToken) {
+         $userToken->delete();
+        return response()->json(["message" => "Sesión cerrada correctamente."]);
+    } else {
+        return response()->json(["error" => "Usuario no autenticado."], 401);
+    }
+
+}
 }

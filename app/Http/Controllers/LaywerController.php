@@ -209,7 +209,7 @@ if ($thisDir->folderPath == null)
                     UPDATE folders 
                     SET folderPath = CASE id 
                     $cases 
-                    END
+                    END,
                     type = 'finished',
                     WHERE id IN ($idsStr)
                     AND id != {$thisDir->id}

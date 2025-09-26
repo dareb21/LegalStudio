@@ -210,7 +210,7 @@ if ($thisDir->folderPath == null)
                     SET folderPath = CASE id 
                     $cases 
                     END,
-                    type = 'finished',
+                    type = 'finished'
                     WHERE id IN ($idsStr)
                     AND id != {$thisDir->id}
                 ");

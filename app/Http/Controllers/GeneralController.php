@@ -24,6 +24,23 @@ class GeneralController extends Controller
         $this->now = now()->setTimezone('America/Tegucigalpa')->format('Y-m-d H:i:s');
     }
 
+public function index()
+    {
+        $rutas = [];
+          Folder::onlyTrashed()
+            ->whereNotNull("hardDelete")
+            ->select("folderPath","id")
+            ->chunk(200, function ($folders) {
+                foreach ($folders as $dir) {
+                  $path = ltrim($dir->folderPath ?? $dir->id, '/'); // quita el "/" inicial
+              $rutas[] = Storage::disk('estudioLegal')->path($path);   
+         //Log::info("Intentando borrar: " . Storage::disk('private')->path($path));
+//Storage::disk('estudioLegal')->deleteDirectory($path);
+    }
+});       
+        return response()->json($rutas);
+    }
+
     public function dashboard()
     { 
 

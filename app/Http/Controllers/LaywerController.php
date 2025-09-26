@@ -309,7 +309,7 @@ return response()->noContent();
 
 public function docActivity($thisDoc)
 {
-$logs = Logger::select("details")->where("doc",$thisDoc)->paginate(50);
+$logs = Logger::select("details")->where("doc",$thisDoc)->orderBy("created_at","asc")->paginate(50);
 return response([
     "logs"=>$logs
 ]);

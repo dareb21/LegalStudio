@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->string("documentName");
-            $table->foreignId('folder_id')->constrained();
+            $table->unsignedBigInteger('folder_id');
+            $table->foreign('folder_id')->references('id')->on('folders');
+            $table->unique(['documentName', 'folder_id']);
             $table->text("folderPath");
             $table->text("description"); //posiblemente nullable
             $table->string("judge")->nullable();

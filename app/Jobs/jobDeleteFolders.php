@@ -25,7 +25,7 @@ class jobDeleteFolders implements ShouldQueue
                 foreach ($folders as $dir) {
                   $path = ltrim($dir->folderPath ?? $dir->id, '/'); // quita el "/" inicial
 Log::info("Intentando borrar: " . Storage::disk('private')->path($path));
-Storage::disk('private')->deleteDirectory($path);
+Storage::disk('estudioLegal')->deleteDirectory($path);
 
                 }
             });

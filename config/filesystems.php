@@ -59,8 +59,8 @@ return [
              'driver' => 'local',
             'root' => "/estudioLegal",
             'visibility' => 'private',
-            'throw' => false,
-            'report' => false,
+            'throw' => true,
+            'report' => true,
         ],
 
 

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Sof;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Database\QueryException;
 
 class GeneralController extends Controller
 {
@@ -26,7 +26,7 @@ class GeneralController extends Controller
 
     public function dashboard()
     { 
-     //DeleteJob::dispatch();   
+
      
     #Espacio Disponible, Espacio Total, % de espacio ocupado    
     $totalSpace = disk_total_space("/estudioLegal");
@@ -94,13 +94,24 @@ public function showDocs($thisDir)
         $parentFolder = null;
         $isRoot = true;
      }
-     
+try{
     $newFolder= Folder::create([
         "folderName"=>$folderName ,
         "parentFolder" =>$parentFolder,
         "type"=>$type,
         "important"=> $important,
      ]);
+        }catch(QueryException $e)
+        {
+          if ($e->getCode() === '23000') {
+        return response()->json([
+            "error" => "La carpeta ya existe en este nivel, favor renombre la carpeta e intente de nuevo"
+        ], 409);
+    }
+
+    throw $e;
+
+        }
      if ($isRoot)
      {
         Storage::disk('estudioLegal')->makeDirectory($newFolder->id);
@@ -187,7 +198,8 @@ if (is_null($folder->folderPath))
     }
 $file->storeAs($folderPath,$fileName,"estudioLegal");
 //$file->storeAs($folderPath,$fileName,"private");
-     $doc= Document::create([ 
+try{    
+$doc= Document::create([ 
           "documentName"   => $fileName,  
           "folder_id"      =>$folder->id,
           "folderPath" =>   $folderPath,
@@ -197,7 +209,17 @@ $file->storeAs($folderPath,$fileName,"estudioLegal");
           "isSensitive"    => $request->isSensitive,
           "important" => $request->important
         ]);
+}
+catch(QueryException $e)
+{
+   if ($e->getCode() === '23000') {
+        return response()->json([
+            "error" => "La carpeta ya existe en este nivel, favor renombre la carpeta e intente de nuevo"
+        ], 409);
+    }
 
+    throw $e;
+}
 switch ($folder->type) {
     case 'active':
         $logType = 'casos activos';

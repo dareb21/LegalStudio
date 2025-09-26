@@ -17,7 +17,9 @@ return new class extends Migration
             $table->text("folderPath")->nullable();
             $table->enum('type', ['active', 'finished', 'jurisprudence']);
             $table->tinyInteger("important")->default(3);
-            $table->foreignId('parentFolder')->nullable()->constrained('folders');
+            $table->unsignedBigInteger('parentFolder')->nullable();
+            $table->foreign('parentFolder')->references('id')->on('folders');
+            $table->unique(['folderName', 'parentFolder']);
             $table->timestamps();
             $table->softDeletes();
             $table->foreignId('deleted_by')->nullable()->constrained('users');
@@ -25,7 +27,6 @@ return new class extends Migration
             $table->dateTime("hardDelete")->nullable();
         });
     }
-
     /**
      * Reverse the migrations.
      */

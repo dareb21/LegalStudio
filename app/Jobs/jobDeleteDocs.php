@@ -20,7 +20,7 @@ class jobDeleteDocs implements ShouldQueue
             ->select("folderPath","documentName")
             ->chunk(200, function ($documents) {
                 foreach ($documents as $doc) {
-                    Storage::disk('private')->delete($doc->folderPath."/".$doc->documentName);
+                    Storage::disk('estudioLegal')->delete($doc->folderPath."/".$doc->documentName);
                 }
             });
     }

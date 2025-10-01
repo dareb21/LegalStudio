@@ -178,7 +178,7 @@ if ($thisDir->folderPath == null)
 }else{
 
         $folders = Folder::select("folderPath","id")->where('folderPath', 'like', '%/'.$thisDir->id.'%')->get();
-
+  $oldPath = $thisDir->folderPath;
         $thisDir->update([
             "type" => "finished",
             "folderPath" => null,
@@ -222,12 +222,7 @@ if ($thisDir->folderPath == null)
         ]);  
 
         DB::commit(); 
-    } catch (Exception $e) {
-        DB::rollBack();
-        return response()->json(['error' => 'Error al cerrar caso', 'detalle' => $e->getMessage()], 500);
-    }
-
-      $oldPath = $thisDir->folderPath;
+        
         $newPath = (string) $thisDir->id; 
         $disk = Storage::disk('estudioLegal');
         $disk->makeDirectory(dirname($newPath));
@@ -235,6 +230,10 @@ if ($thisDir->folderPath == null)
             $disk->path($oldPath),  
             $disk->path($newPath)   
         );
+    } catch (Exception $e) {
+        DB::rollBack();
+        return response()->json(['error' => 'Error al cerrar caso', 'detalle' => $e->getMessage()], 500);
+    }
     return response()->json("Su caso paso a cerrado");
 }
 

@@ -5,8 +5,6 @@ use App\Http\Controllers\GeneralController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LaywerController;
 
-Route::post("/rutas",[GeneralController::class, 'index']);
-
 Route::middleware('auth:sanctum')->group(function () {
     Route::get("/authUser",[LoginController::class, 'authUser']);
     

@@ -213,8 +213,6 @@ if (is_null($folder->folderPath))
     {
         $folderPath = $folder->folderPath;
     }
-$file->storeAs($folderPath,$fileName,"estudioLegal");
-//$file->storeAs($folderPath,$fileName,"private");
 try{    
 $doc= Document::create([ 
           "documentName"   => $fileName,  
@@ -237,6 +235,9 @@ catch(QueryException $e)
 
     throw $e;
 }
+$file->storeAs($folderPath,"docId_".$doc->id,"estudioLegal");
+//$file->storeAs($folderPath,"docId_".$doc->id,"private");
+
 switch ($folder->type) {
     case 'active':
         $logType = 'casos activos';
@@ -269,12 +270,12 @@ Logger::create([
 
 public function downloadDoc($thisDoc, Request $request)
 {
- $docInfo=Document::where("id",$thisDoc)->select("isSensitive","documentName","folderPath")->first();
+ $docInfo=Document::where("id",$thisDoc)->select("id","isSensitive","documentName","folderPath")->first();
  if (!$docInfo)
  {
     return response()->json("No se encontro este archivo.");
  }
- $path =ltrim($docInfo->folderPath . "/" . $docInfo->documentName);
+ $path =ltrim($docInfo->folderPath . "/docId_" . $docInfo->id);
 
  $user = $request->user(); 
   
@@ -286,7 +287,7 @@ public function downloadDoc($thisDoc, Request $request)
     "details" => $user->name." descargo el documento: " . $docInfo->documentName . " el dia " . $this->now,
 ]);
     
-    return Storage::disk("estudioLegal")->download($path);
+    return Storage::disk("estudioLegal")->download($path,$docInfo->documentName);
     //return Storage::disk("private")->download($path);        
     }
 
@@ -321,7 +322,7 @@ $petition = DownloadRequest::where("document_id",$thisDoc)->where("requested_by"
 $petition->status = 0;
     $petition->save();
 
-    return Storage::disk("estudioLegal")->download($path);
+    return Storage::disk("estudioLegal")->download($path,$docInfo->documentName);
    
     //return Storage::disk("private")->download($path);
     }else

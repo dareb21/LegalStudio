@@ -177,15 +177,6 @@ if ($thisDir->folderPath == null)
 
 }else{
 
-      $oldPath = $thisDir->folderPath;
-        $newPath = (string) $thisDir->id; 
-        $disk = Storage::disk('estudioLegal');
-        $disk->makeDirectory(dirname($newPath));
-        rename(
-            $disk->path($oldPath),  
-            $disk->path($newPath)   
-        );
-
         $folders = Folder::select("folderPath","id")->where('folderPath', 'like', '%/'.$thisDir->id.'%')->get();
 
         $thisDir->update([
@@ -225,7 +216,6 @@ if ($thisDir->folderPath == null)
         }
 }
         Document::whereIn("id",$toDelete)->update($toDeleteInfo);
-
        Logger::create([
             "who" => $user->id,
             "details" => $user->name ." Cerro el caso ". $thisDir->folderName  .  " el dia " . $this->now,
@@ -234,9 +224,17 @@ if ($thisDir->folderPath == null)
         DB::commit(); 
     } catch (Exception $e) {
         DB::rollBack();
-        return response()->json(['error' => 'Error al guardar el documento', 'detalle' => $e->getMessage()], 500);
+        return response()->json(['error' => 'Error al cerrar caso', 'detalle' => $e->getMessage()], 500);
     }
 
+      $oldPath = $thisDir->folderPath;
+        $newPath = (string) $thisDir->id; 
+        $disk = Storage::disk('estudioLegal');
+        $disk->makeDirectory(dirname($newPath));
+        rename(
+            $disk->path($oldPath),  
+            $disk->path($newPath)   
+        );
     return response()->json("Su caso paso a cerrado");
 }
 
@@ -317,12 +315,12 @@ return response([
 
 public function downloadDoc($thisDoc, Request $request)
 {
- $docInfo=Document::where("id",$thisDoc)->select("documentName","folderPath")->first();
+ $docInfo=Document::where("id",$thisDoc)->select("id","documentName","folderPath")->first();
  if (!$docInfo)
  {
     return response()->json("No se encontro este archivo.");
  }
- $path =ltrim($docInfo->folderPath . "/" . $docInfo->documentName);
+ $path =ltrim($docInfo->folderPath . "/docId_" . $docInfo->id);
 
  $user = $request->user(); 
   
@@ -331,7 +329,7 @@ public function downloadDoc($thisDoc, Request $request)
     "doc"=>$thisDoc,
     "details" => $user->name." descargo el documento: " . $docInfo->documentName . " el dia " . $this->now,
 ]);    
-    return Storage::disk("estudioLegal")->download($path);
+    return Storage::disk("estudioLegal")->download($path,$docInfo->documentName);
     }
 
 }

@@ -25,6 +25,7 @@ return new class extends Migration
             $table->foreignId('deleted_by')->nullable()->constrained('users');
             $table->string('deleted_by_name')->nullable();
             $table->dateTime("hardDelete")->nullable();
+             $table->boolean("hardDeleted")->nullable();
         });
     }
     /**

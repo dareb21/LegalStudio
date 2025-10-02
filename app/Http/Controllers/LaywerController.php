@@ -48,7 +48,7 @@ $user = $request->user();
       $status = $request->reply ? "aprobò":"rechazò";
    Logger::create([
     "who" => $user->id,
-    "details" => $user->name . $status  . "la solicitud de descarga de: " . $thisRequest->requested_by_name . " con fin de descargar el documento ".$thisRequest->document_name . " el dia " . $this->now,
+    "details" => $user->name . $status  . " la solicitud de descarga de: " . $thisRequest->requested_by_name . " con fin de descargar el documento ".$thisRequest->document_name . " el dia " . $this->now,
 ]);
     return response()->json([
         "statusP" => "Su solicitud fue ". $status,

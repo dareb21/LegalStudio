@@ -4,6 +4,9 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\GeneralController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LaywerController;
+use App\Http\Controllers\HardDeleteController;
+Route::delete("/docsHardDelete",[HardDeleteController::class, 'deleteDocs']);
+Route::delete("/dirsHardDelete",[HardDeleteController::class, 'deleteFolders']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get("/authUser",[LoginController::class, 'authUser']);
@@ -15,6 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/dashboard",[GeneralController::class, 'dashboard']);
         Route::get("/dirs/{type}",[GeneralController::class, 'showDirs']);
         Route::get("/thisDir/{thisDir}",[GeneralController::class, 'showThisDir']);
+        
         Route::get("/docsInThisDir/{thisDir}",[GeneralController::class, 'showDocs']);
         Route::post("/makeDir",[GeneralController::class, 'makeDir']);
         Route::get("/downloadDoc/{thisDoc}",[GeneralController::class, 'downloadDoc']);

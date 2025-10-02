@@ -5,7 +5,6 @@ use Illuminate\Http\Request;
 use  App\Models\Folder;
 use App\Models\Document;
 use App\Models\DownloadRequest;
-use App\Jobs\DeleteJob;
 use App\Models\Logger;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -24,22 +23,6 @@ class GeneralController extends Controller
         $this->now = now()->setTimezone('America/Tegucigalpa')->format('Y-m-d H:i:s');
     }
 
-public function index()
-    {
-        $rutas = [];
-          Folder::onlyTrashed()
-            ->whereNotNull("hardDelete")
-            ->select("folderPath","id")
-            ->chunk(200, function ($folders) {
-                foreach ($folders as $dir) {
-                  $path = ltrim($dir->folderPath ?? $dir->id, '/'); // quita el "/" inicial
-              $rutas[] = Storage::disk('estudioLegal')->path($path);   
-         //Log::info("Intentando borrar: " . Storage::disk('private')->path($path));
-//Storage::disk('estudioLegal')->deleteDirectory($path);
-    }
-});       
-        return response()->json($rutas);
-    }
 
     public function dashboard()
     { 
@@ -84,7 +67,13 @@ public function showThisDir($thisDir)
         "dirs"=>$dirs,
     ]);
 }
-
+public function showThisDirDate()
+{
+    $dirs = Folder::select("id","folderName","important")->where("parentFolder",$thisDir)->OrderBy("created_at","desc")->paginate(20);  //Indexar este campo
+    return  response()->json([
+        "dirs"=>$dirs,
+    ]);
+}
 public function showDocs($thisDir)
 {
     $docs = Document::where("folder_id",$thisDir)->OrderBy("important","asc")->OrderBy("created_at","desc")->paginate(20); //Indexar folder_id
@@ -132,7 +121,7 @@ try{
      if ($isRoot)
      {
         Storage::disk('estudioLegal')->makeDirectory($newFolder->id);
-        //Storage::disk('private')->makeDirectory($newFolder->id);
+       //Storage::disk('private')->makeDirectory($newFolder->id);
          
      }else
      {
@@ -187,7 +176,6 @@ Logger::create([
 public function uploadDoc(Request $request,$thisDir)
     { 
       $request->validate([
-         "important"=>"required|integer|in:1,2,3",
          "description"=>"required|string|filled",
         "judge" => "nullable|string",
        "isSensitive" => "required|boolean",
@@ -229,7 +217,7 @@ catch(QueryException $e)
 {
    if ($e->getCode() === '23000') {
         return response()->json([
-            "error" => "La carpeta ya existe en este nivel, favor renombre la carpeta e intente de nuevo"
+            "error" => "El documento ya existe en este nivel, favor renombre el documento e intente de nuevo"
         ], 409);
     }
 

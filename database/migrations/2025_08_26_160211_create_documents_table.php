@@ -22,12 +22,12 @@ return new class extends Migration
             $table->string("judge")->nullable();
             $table->string("whoMadeIt");
             $table->boolean("isSensitive")->default(0);
-            $table->tinyInteger("important")->default(3);;
             $table->timestamps();
             $table->softDeletes();
             $table->foreignId('deleted_by')->nullable()->constrained('users');
             $table->string('deleted_by_name')->nullable();
             $table->dateTime("hardDelete")->nullable();
+            $table->boolean("hardDeleted")->nullable();
             
         });
     }

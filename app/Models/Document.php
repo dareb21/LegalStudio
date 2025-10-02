@@ -18,10 +18,10 @@ class Document extends Model
     "isSensitive",
     "photo",
     "record",
-    "important",
     "hardDelete",
     "folderPath",
     "deleted_by",
-    "deleted_by_name"
+    "deleted_by_name",
+    "hardDeleted"
     ];
 }

@@ -67,13 +67,24 @@ public function showThisDir($thisDir)
         "dirs"=>$dirs,
     ]);
 }
-public function showThisDirDate()
+
+ public function showDirsByDate($type)
+    {
+    if (!in_array($type, ['active', 'finished', 'jurisprudence'])) {
+        return response()->json(['error' => 'Tipo de carpeta no reconocido'], );
+    }    
+    $dirs = Folder::select("id","folderName")->where("parentFolder",null)->where("type",$type)->OrderBy("created_at","asc")->get(); //Indexar parentFolder   
+    return  response()->json($dirs);  
+}
+
+public function showThisDirByDate($thisDir)
 {
-    $dirs = Folder::select("id","folderName","important")->where("parentFolder",$thisDir)->OrderBy("created_at","desc")->paginate(20);  //Indexar este campo
+    $dirs = Folder::select("id","folderName","important")->where("parentFolder",$thisDir)->OrderBy("created_at","asc")->paginate(20);  //Indexar este campo
     return  response()->json([
         "dirs"=>$dirs,
     ]);
 }
+
 public function showDocs($thisDir)
 {
     $docs = Document::where("folder_id",$thisDir)->OrderBy("created_at","desc")->paginate(20); //Indexar folder_id

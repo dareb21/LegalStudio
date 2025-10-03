@@ -18,7 +18,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get("/dashboard",[GeneralController::class, 'dashboard']);
         Route::get("/dirs/{type}",[GeneralController::class, 'showDirs']);
         Route::get("/thisDir/{thisDir}",[GeneralController::class, 'showThisDir']);
-        
+        Route::get("/dirsCron/{type}",[GeneralController::class, 'showDirsByDate']);
+        Route::get("/thisDirCron/{thisDir}",[GeneralController::class, 'showThisDirByDate']);
         Route::get("/docsInThisDir/{thisDir}",[GeneralController::class, 'showDocs']);
         Route::post("/makeDir",[GeneralController::class, 'makeDir']);
         Route::get("/downloadDoc/{thisDoc}",[GeneralController::class, 'downloadDoc']);

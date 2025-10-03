@@ -76,7 +76,7 @@ public function showThisDirDate()
 }
 public function showDocs($thisDir)
 {
-    $docs = Document::where("folder_id",$thisDir)->OrderBy("important","asc")->OrderBy("created_at","desc")->paginate(20); //Indexar folder_id
+    $docs = Document::where("folder_id",$thisDir)->OrderBy("created_at","desc")->paginate(20); //Indexar folder_id
     return  response()->json([
       "docs"=>  $docs
     ]);

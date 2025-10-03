@@ -11,28 +11,33 @@ class HardDeleteController extends Controller
 {
  public function deleteDocs()
     {
-$path = [];        
-$disk = Storage::disk("private");
+$path = [];      
+$ids = [];  
+$disk = Storage::disk("estudioLegal");
 Document::onlyTrashed()
-    ->whereNotNull("hardDelete")
+    ->where("hardDeleted",false)
     ->select("folderPath", "id")
-    ->chunk(200, function ($docs) use ($disk,&$path) {
+    ->chunk(200, function ($docs) use (&$path,&$ids) {
         foreach ($docs as $doc) {
             $path[] = $doc->folderPath . "/docId_" . $doc->id;
+          $ids[] =  $doc->id;
         }
     });
+if (!empty($ids))
+{
+Document::withTrashed()->whereIn("id",$ids)->update(['hardDeleted' => True]);   
  $disk->delete($path);
-return response()->json("Borrados");
+}
 }
 
 public function deleteFolders()
 {
-    $ids = [];
-$disk = Storage::disk("private");
+$ids = [];
+$disk = Storage::disk("estudioLegal");
 Folder::onlyTrashed()
     ->where("hardDeleted",false)
     ->select("folderPath","id")
-      ->chunk(200, function ($dirs) use ($disk, &$ids)  {
+      ->chunk(200, function ($dirs) use (&$disk, &$ids)  {
         foreach ($dirs as $dir) {
             if (is_null($dir->folderPath))
             {
@@ -44,10 +49,11 @@ Folder::onlyTrashed()
         $ids[] =  $dir->id;
         }
     });
+    
 if (!empty($ids))
 {
-Folder::whereIn("id",$ids)->update("hardDeleted",true);    
+
+Folder::withTrashed()->whereIn('id', $ids)->update(['hardDeleted' => True]); 
 }
-return response()->json("Borrado con exito");
 }
 }

@@ -104,7 +104,7 @@ Logger::create([
           ->whereNull("documents.hardDelete")
           ->where("folders.type",$dirType)
           ->orderBy("documents.deleted_at","desc")
-          ->select("documents.id as docId","documents.documentName as docName","documents.description as docDesc","documents.whoMadeIt as whoUpload","documents.isSensitive","documents.deleted_at as deletedAt","documents.important","documents.judge","documents.deleted_by_name as deletedBy")
+          ->select("documents.id as docId","documents.documentName as docName","documents.description as docDesc","documents.whoMadeIt as whoUpload","documents.isSensitive","documents.deleted_at as deletedAt","documents.judge","documents.deleted_by_name as deletedBy")
           ->paginate(10);
 
         $folder =Folder::onlyTrashed()

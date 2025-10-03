@@ -329,7 +329,7 @@ $petition->status = 0;
  public function downloadRequest(Document $thisDoc, Request $request)
 { 
  $user = $request->user(); 
-    if (downloadRequest::where("document_id",$thisDoc)->where("requested_by",$user->id)->whereNull("status")->exists())
+    if (DownloadRequest::where("document_id",$thisDoc)->where("requested_by",$user->id)->whereNull("status")->exists())
     {
         return response()->json([
            "statusP"=>"Ya existe una solicitud pendiente para este documento"

@@ -56,7 +56,7 @@ return [
     if (!in_array($type, ['active', 'finished', 'jurisprudence'])) {
         return response()->json(['error' => 'Tipo de carpeta no reconocido'], );
     }    
-    $dirs = Folder::select("id","folderName")->where("parentFolder",null)->where("type",$type)->OrderBy("important","asc")->OrderBy("created_at","desc")->get(); //Indexar parentFolder   
+    $dirs = Folder::select("id","folderName","important")->where("parentFolder",null)->where("type",$type)->OrderBy("important","asc")->OrderBy("created_at","desc")->get(); //Indexar parentFolder   
     return  response()->json($dirs);  
 }
 
@@ -73,7 +73,7 @@ public function showThisDir($thisDir)
     if (!in_array($type, ['active', 'finished', 'jurisprudence'])) {
         return response()->json(['error' => 'Tipo de carpeta no reconocido'], );
     }    
-    $dirs = Folder::select("id","folderName")->where("parentFolder",null)->where("type",$type)->OrderBy("created_at","asc")->get(); //Indexar parentFolder   
+    $dirs = Folder::select("id","folderName","important")->where("parentFolder",null)->where("type",$type)->OrderBy("created_at","asc")->get(); //Indexar parentFolder   
     return  response()->json($dirs);  
 }
 

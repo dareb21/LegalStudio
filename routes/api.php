@@ -31,8 +31,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::patch('/banThisUser/{userId}', [AdminController::class, 'banThisUser']);
             Route::patch('/unBanThisUser/{userId}', [AdminController::class, 'unBanThisUser']);
             Route::get('/seeBans', [AdminController::class, 'seeBans']);
-            Route::get("/allLogs", [AdminController::class, 'allLogs']);
-            Route::get("/userLogs/{userId}",[AdminController::class,"specificLog"]);
+            Route::post("/allLogs", [AdminController::class, 'allLogs']);
+            Route::post("/userLogs/{userId}",[AdminController::class,"specificLog"]);
             Route::put("/editUser/{userId}",[AdminController::class,"edition"]);
         });
         Route::middleware("logsAndDown")->group(function(){

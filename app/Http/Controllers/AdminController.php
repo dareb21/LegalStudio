@@ -144,13 +144,14 @@ public function allLogs(Request $request)
     $dateEnd   = $request->dateEnd;
 
     $users = User::select("id","name")->get();
-    $logs = Logger::select("details")
-            ->when($dateStart && $dateEnd, function ($query) use ($dateStart, $dateEnd) {
-            $query->whereBetween("created_at", [$dateStart, $dateEnd]);
-        })
-        ->orderBy("created_at","DESC")
-        ->paginate(30);
-$details= [];
+$logs = Logger::select("details")
+    ->when($dateStart && $dateEnd, function ($query) use ($dateStart, $dateEnd) {
+        $query->whereBetween(DB::raw('DATE(created_at)'), [$dateStart, $dateEnd]);
+    })
+    ->orderBy("created_at", "DESC")
+    ->paginate(30);
+    
+    $details= [];
         foreach ($logs as $log)
         {
             $details[] = $log->details;

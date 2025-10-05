@@ -5,6 +5,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use App\Models\Logger;
 
 class AdminController extends Controller
@@ -177,7 +178,7 @@ public function specificLog($userId,Request $request)
     $userInfo = Logger::select("details")
         ->where("who", $userId)
         ->when($dateStart && $dateEnd, function ($query) use ($dateStart, $dateEnd) {
-            $query->whereBetween("created_at", [$dateStart, $dateEnd]);
+        $query->whereBetween(DB::raw('DATE(created_at)'), [$dateStart, $dateEnd]);
         })
      ->orderBy("created_at","DESC")
         ->paginate(30);

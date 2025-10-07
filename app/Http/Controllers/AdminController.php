@@ -32,6 +32,8 @@ if ($userInfo->role === "Admin")
 }
      $userInfo->banned = 1;
      $userInfo->save();
+     $userInfo->tokens()->delete();
+     
  $user = $request->user(); 
      Logger::create([
     "who" => $user->id,
